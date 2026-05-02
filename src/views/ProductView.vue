@@ -1,10 +1,5 @@
 <template>
   <section v-if="product" class="page page-product">
-    <div v-if="store.toast" class="toast" :class="`toast-${store.toast.type}`">
-      <span>{{ store.toast.message }}</span>
-      <button type="button" @click="store.dismissToast()">×</button>
-    </div>
-
     <nav class="breadcrumbs">
       <RouterLink to="/shop">Shop</RouterLink>
       <span>/</span>

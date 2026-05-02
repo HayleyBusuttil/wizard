@@ -1,10 +1,5 @@
 <template>
   <section class="page page-cart refined-layout">
-    <div v-if="store.toast" class="toast" :class="`toast-${store.toast.type}`">
-      <span>{{ store.toast.message }}</span>
-      <button type="button" @click="store.dismissToast()">×</button>
-    </div>
-
     <header class="shop-hero cart-hero">
       <div>
         <p class="eyebrow">Cart</p>
