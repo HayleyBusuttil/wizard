@@ -380,9 +380,9 @@ export const useProductStore = defineStore("products", {
       }
 
       if (this.wizard.active) {
-        if (this.wizard.step < 4) {
+        if (this.wizard.step < 5) {
           this.showToast(
-            "Follow guided mode: open the selected product before adding to cart",
+            "Follow guided mode: choose the product options before adding to cart",
             "warning",
           );
           return;
@@ -424,8 +424,8 @@ export const useProductStore = defineStore("products", {
       });
       this.showToast(`${product.name} added to cart`);
 
-      if (this.wizard.active && this.wizard.step === 4) {
-        this.wizard.step = 5;
+      if (this.wizard.active && this.wizard.step === 5) {
+        this.wizard.step = 6;
       }
     },
     updateCartQuantity(productId, color, quantity, size = null) {
@@ -528,6 +528,10 @@ export const useProductStore = defineStore("products", {
     },
 
     startWizard() {
+      this.filters.search = "";
+      this.filters.category = "All";
+      this.filters.collection = "All";
+      this.filters.sort = "featured";
       this.wizard.active = true;
       this.wizard.step = 1;
       this.wizard.selectedProductId = null;
@@ -569,6 +573,18 @@ export const useProductStore = defineStore("products", {
     },
 
     completeWizardAddToCart(productId) {
+      if (!this.wizard.active || this.wizard.step !== 5) {
+        return;
+      }
+
+      if (this.wizard.selectedProductId !== productId) {
+        return;
+      }
+
+      this.wizard.step = 6;
+    },
+
+    completeWizardOptions(productId) {
       if (!this.wizard.active || this.wizard.step !== 4) {
         return;
       }
@@ -625,7 +641,7 @@ export const useProductStore = defineStore("products", {
         return true;
       }
 
-      if (this.wizard.step < 5) {
+      if (this.wizard.step < 6) {
         this.showToast(
           "Follow guided mode: add the selected product to cart before checkout",
           "warning",

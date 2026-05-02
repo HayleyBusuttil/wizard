@@ -49,10 +49,14 @@
           <span>{{ product.stock }} left</span>
         </div>
 
-        <div class="selection-panel">
+        <div
+          class="selection-panel"
+          :class="{ 'wizard-focus': shouldHighlightOptions }"
+          data-wizard-target="product-options"
+        >
           <label class="input-group">
             <span>Color</span>
-            <select v-model="selectedColor">
+            <select v-model="selectedColor" @change="completeOptionStep">
               <option v-for="color in product.colors" :key="color" :value="color">{{ color }}</option>
             </select>
           </label>
@@ -66,7 +70,7 @@
                 type="button"
                 class="size-pill"
                 :class="{ active: selectedSize === size }"
-                @click="selectedSize = size"
+                @click="selectSize(size)"
               >
                 {{ size }}
               </button>
@@ -84,7 +88,13 @@
         </div>
 
         <div class="button-row">
-          <button class="button primary-add" :class="{ 'wizard-focus': shouldHighlightAdd }" type="button" @click="addToCart">
+          <button
+            class="button primary-add"
+            :class="{ 'wizard-focus': shouldHighlightAdd }"
+            data-wizard-target="add-to-cart"
+            type="button"
+            @click="addToCart"
+          >
             Add {{ quantity }} to cart
           </button>
           <button
@@ -218,6 +228,13 @@ const relatedProducts = computed(() =>
 const shouldHighlightAdd = computed(
   () =>
     store.wizard.active &&
+    store.wizard.step === 5 &&
+    store.wizard.selectedProductId === product.value?.id,
+)
+
+const shouldHighlightOptions = computed(
+  () =>
+    store.wizard.active &&
     store.wizard.step === 4 &&
     store.wizard.selectedProductId === product.value?.id,
 )
@@ -239,7 +256,20 @@ function addToCart() {
     return
   }
 
-  store.addToCart(product.value.id, quantity.value, selectedColor.value)
+  store.addToCart(product.value.id, quantity.value, selectedColor.value, selectedSize.value)
+}
+
+function completeOptionStep() {
+  if (!product.value) {
+    return
+  }
+
+  store.completeWizardOptions(product.value.id)
+}
+
+function selectSize(size) {
+  selectedSize.value = size
+  completeOptionStep()
 }
 
 function increaseQuantity() {
@@ -248,9 +278,11 @@ function increaseQuantity() {
   }
 
   quantity.value = Math.min(product.value.stock, quantity.value + 1)
+  completeOptionStep()
 }
 
 function decreaseQuantity() {
   quantity.value = Math.max(1, quantity.value - 1)
+  completeOptionStep()
 }
 </script>

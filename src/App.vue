@@ -15,7 +15,6 @@
       <router-view />
     </main>
 
-    <!-- ✅ NEW: Guided Toast (improved) -->
     <transition name="fade">
       <div v-if="store.toast" class="guided-toast">
         <div class="guided-toast-content">
@@ -35,29 +34,28 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue"
+import { useRouter } from "vue-router"
 import Navbar from "./components/Navbar.vue"
 import WizardPanel from "./components/WizardPanel.vue"
-import { onMounted } from "vue"
 import { useProductStore } from "./stores/productStore"
 
 const store = useProductStore()
+const router = useRouter()
 
-// ✅ Auto-start wizard
 onMounted(() => {
   if (!store.wizard.active) {
     store.startWizard()
-
-    // ✅ Show first instruction clearly
+    router.replace("/shop")
     store.toast = {
       title: "Welcome to Guided Mode",
-      message: "Start by selecting a category to explore products."
+      message: "Start by selecting a category to explore products.",
     }
   }
 })
 </script>
 
 <style scoped>
-/* ===== Improved Toast ===== */
 .guided-toast {
   position: fixed;
   bottom: 28px;
@@ -100,7 +98,6 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* ===== Smooth animation ===== */
 .fade-enter-active,
 .fade-leave-active {
   transition: all 0.25s ease;

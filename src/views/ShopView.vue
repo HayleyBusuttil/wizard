@@ -172,7 +172,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref, watch } from "vue"
+import { computed, ref, watch } from "vue"
 import { useProductStore } from "../stores/productStore"
 import ProductCard from "../components/ProductCard.vue"
 
@@ -191,8 +191,9 @@ const wizardInstruction = computed(() => {
     1: "Choose a category to begin browsing.",
     2: "Select one product card to continue.",
     3: "Open the highlighted product card.",
-    4: "Add the selected product to your cart.",
-    5: "Open checkout to finish the task.",
+    4: "Choose the product options shown on the product page.",
+    5: "Use the highlighted add-to-cart button.",
+    6: "Complete checkout to finish the task.",
   }
 
   return instructions[store.wizard.step] ?? "Follow the guided shopping flow."
@@ -203,8 +204,9 @@ const wizardSupport = computed(() => {
     1: "The category filter is the required first action.",
     2: "The selected card will glow and stay pinned for the next step.",
     3: "Only the selected product can move you forward.",
-    4: "The add-to-cart button becomes the next highlighted target.",
-    5: "Review the checkout section to complete the simulated order.",
+    4: "Change color, size, or quantity to unlock the next step.",
+    5: "The add-to-cart button is the next highlighted target.",
+    6: "Review the checkout section to complete the simulated order.",
   }
 
   return support[store.wizard.step] ?? "Use the visible guidance to continue."
@@ -309,12 +311,6 @@ const nextPage = () => {
 const isStep = (step) => {
   return store.wizard.active && store.wizard.step === step
 }
-
-onMounted(() => {
-  if (!store.wizard.active) {
-    store.startWizard()
-  }
-})
 
 const isProductOpenLocked = (productId) => {
   if (!store.wizard.active) {
