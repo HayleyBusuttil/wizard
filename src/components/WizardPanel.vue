@@ -5,14 +5,33 @@
         <div>
           <p class="eyebrow">Guided mode</p>
           <h2>{{ panelTitle }}</h2>
+          <p class="wizard-panel-copy">{{ panelCopy }}</p>
         </div>
 
         <span class="wizard-step-counter">{{ stepCounter }}</span>
       </div>
 
-      <p class="wizard-panel-copy">{{ panelCopy }}</p>
+      <div v-if="store.wizard.active" class="wizard-progress-block">
+        <div class="wizard-progress-meta">
+          <strong>Current objective</strong>
+          <span>{{ currentObjective }}</span>
+        </div>
+
+        <div class="wizard-progress-track" aria-hidden="true">
+          <div class="wizard-progress-fill" :style="{ width: `${progressPercent}%` }"></div>
+        </div>
+      </div>
 
       <div class="wizard-panel-actions">
+        <button
+          v-if="store.wizard.active"
+          type="button"
+          class="button-soft button-sm"
+          :disabled="store.wizard.step === 1"
+          @click="goBack"
+        >
+          Back a step
+        </button>
         <button
           v-if="store.wizard.active"
           type="button"
@@ -65,36 +84,44 @@ const stepMap = {
   1: {
     selector: '[data-wizard-target="category-select"]',
     title: "Choose category",
-    copy: "Open the shop, choose a category, and unlock the product grid.",
+    copy: "Choose a category to unlock the next focused set of products.",
+    route: "/shop",
   },
   2: {
     selector: '[data-wizard-target="product-grid"]',
     title: "Select product",
-    copy: "Use the product cards to choose a single item to continue with.",
+    copy: "Select one product from the narrowed product grid.",
+    route: "/shop",
   },
   3: {
     selector: '[data-wizard-target="wizard-selected-product"]',
     title: "Open product",
-    copy: "Open the selected product card to move into the detail page.",
+    copy: "Open the selected product card to continue.",
+    route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
   4: {
     selector: '[data-wizard-target="product-options"]',
     title: "Choose options",
-    copy: "Use the product options area to choose color, size, or quantity for the selected item.",
+    copy: "Choose valid product options before the add-to-cart step unlocks.",
+    route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
   5: {
     selector: '[data-wizard-target="add-to-cart"]',
     title: "Add to cart",
-    copy: "Add the selected item from the product page to continue.",
+    copy: "Add the configured item from the product page to continue.",
+    route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
   6: {
     selector: '[data-wizard-target="checkout-panel"]',
     title: "Checkout",
     copy: "Review the cart and complete the simulated checkout form.",
+    route: "/cart",
   },
 }
 
 const currentStep = computed(() => store.wizardSteps.find((item) => item.step === store.wizard.step))
+const progressPercent = computed(() => (store.wizard.active ? (store.wizard.step / store.wizardSteps.length) * 100 : 0))
+const currentObjective = computed(() => currentStep.value?.description ?? "Start the guided flow.")
 
 const panelTitle = computed(() => {
   if (!store.wizard.active) {
@@ -117,21 +144,11 @@ const panelCopy = computed(() => {
     return "Start guided mode to follow the shop-to-checkout path with visible in-context guidance."
   }
 
-  const step = stepMap[store.wizard.step]
-  if (!step) {
-    return "Follow the guided flow to complete the shopping task."
-  }
-
-  return step.copy
+  return stepMap[store.wizard.step]?.copy ?? "Follow the guided flow to complete the shopping task."
 })
 
 const spotlightStyle = computed(() => {
-  if (
-    !spotlight.value ||
-    !store.wizard.active ||
-    store.wizard.step <= 2 ||
-    typeof window === "undefined"
-  ) {
+  if (!spotlight.value || !store.wizard.active || typeof window === "undefined") {
     return null
   }
 
@@ -178,6 +195,20 @@ function wizardStepState(step) {
 function startWizard() {
   store.startWizard()
   router.replace("/shop")
+}
+
+function goBack() {
+  if (!store.wizard.active || store.wizard.step === 1) {
+    return
+  }
+
+  store.goToPreviousWizardStep()
+  const target = stepMap[store.wizard.step]?.route
+  const destination = typeof target === "function" ? target() : target
+
+  if (destination && route.path !== destination) {
+    router.replace(destination)
+  }
 }
 
 function updateSpotlight() {
@@ -255,8 +286,8 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(35, 45, 68, 0.12);
   border-radius: 24px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(248, 245, 239, 0.92)),
-    rgba(255, 255, 255, 0.88);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(246, 242, 235, 0.94)),
+    rgba(255, 255, 255, 0.9);
   box-shadow: 0 18px 38px rgba(35, 45, 68, 0.08);
   backdrop-filter: blur(14px);
 }
@@ -271,7 +302,9 @@ onBeforeUnmount(() => {
 .wizard-panel-header h2,
 .wizard-panel-copy,
 .wizard-step-item p,
-.wizard-step-item strong {
+.wizard-step-item strong,
+.wizard-progress-meta strong,
+.wizard-progress-meta span {
   margin: 0;
 }
 
@@ -291,11 +324,53 @@ onBeforeUnmount(() => {
 .wizard-panel-copy {
   color: #5f677a;
   max-width: 58ch;
+  margin-top: 6px;
+}
+
+.wizard-progress-block {
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(35, 45, 68, 0.05);
+  border: 1px solid rgba(35, 45, 68, 0.08);
+}
+
+.wizard-progress-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.wizard-progress-meta strong {
+  color: #1d2436;
+}
+
+.wizard-progress-meta span {
+  color: #5f677a;
+  font-weight: 600;
+}
+
+.wizard-progress-track {
+  width: 100%;
+  height: 12px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(35, 45, 68, 0.1);
+}
+
+.wizard-progress-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #232d44 0%, #6f8b7d 100%);
+  transition: width 220ms ease;
 }
 
 .wizard-panel-actions {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .wizard-step-list {
@@ -343,7 +418,8 @@ onBeforeUnmount(() => {
 
 .wizard-step-item.is-current {
   border-color: rgba(35, 45, 68, 0.18);
-  background: linear-gradient(180deg, rgba(35, 45, 68, 0.08), rgba(35, 45, 68, 0.03));
+  background: linear-gradient(180deg, rgba(35, 45, 68, 0.1), rgba(35, 45, 68, 0.03));
+  box-shadow: 0 14px 28px rgba(35, 45, 68, 0.08);
 }
 
 .wizard-step-item.is-current .wizard-step-number {
@@ -357,7 +433,7 @@ onBeforeUnmount(() => {
 }
 
 .wizard-step-item.is-upcoming {
-  opacity: 0.82;
+  opacity: 0.72;
 }
 
 .wizard-overlay {
@@ -369,8 +445,8 @@ onBeforeUnmount(() => {
 
 .wizard-overlay-piece {
   position: fixed;
-  background: rgba(243, 242, 240, 0.28);
-  backdrop-filter: blur(2px);
+  background: rgba(243, 242, 240, 0.42);
+  backdrop-filter: blur(3px);
 }
 
 @media (max-width: 720px) {
@@ -384,8 +460,10 @@ onBeforeUnmount(() => {
     border-radius: 20px;
   }
 
-  .wizard-panel-header {
+  .wizard-panel-header,
+  .wizard-progress-meta {
     flex-direction: column;
+    align-items: flex-start;
   }
 
   .wizard-step-list {

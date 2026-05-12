@@ -70,6 +70,10 @@ function isLocked(path) {
     return true
   }
 
+  if (store.wizard.step === 5) {
+    return path !== "/product"
+  }
+
   return path !== "/cart"
 }
 

@@ -425,7 +425,7 @@ export const useProductStore = defineStore("products", {
       this.showToast(`${product.name} added to cart`);
 
       if (this.wizard.active && this.wizard.step === 5) {
-        this.wizard.step = 6;
+        this.setWizardStep(6);
       }
     },
     updateCartQuantity(productId, color, quantity, size = null) {
@@ -528,6 +528,8 @@ export const useProductStore = defineStore("products", {
     },
 
     startWizard() {
+      this.comparison = [];
+      persistJSON(compareStorageKey, this.comparison);
       this.filters.search = "";
       this.filters.category = "All";
       this.filters.collection = "All";
@@ -535,6 +537,58 @@ export const useProductStore = defineStore("products", {
       this.wizard.active = true;
       this.wizard.step = 1;
       this.wizard.selectedProductId = null;
+      this.wizard.maxStep = 1;
+    },
+
+    setWizardStep(step) {
+      this.wizard.step = step;
+      this.wizard.maxStep = Math.max(this.wizard.maxStep, step);
+    },
+
+    validateWizardCategory() {
+      if (this.filters.category === "All") {
+        this.showToast("Choose a category to continue", "warning");
+        return false;
+      }
+
+      if (!this.filteredProducts.length) {
+        this.showToast("Choose a category with available products", "warning");
+        return false;
+      }
+
+      return true;
+    },
+
+    validateWizardOptions(productId, selection = {}) {
+      if (this.wizard.selectedProductId !== productId) {
+        this.showToast("Complete the guided product before continuing", "warning");
+        return false;
+      }
+
+      const { color, size, quantity } = selection;
+      if (!color || !size || !quantity || quantity < 1) {
+        this.showToast("Choose valid color, size, and quantity first", "warning");
+        return false;
+      }
+
+      return true;
+    },
+
+    goToPreviousWizardStep() {
+      if (!this.wizard.active || this.wizard.step <= 1) {
+        return;
+      }
+
+      const previousStep = this.wizard.step - 1;
+      this.wizard.step = previousStep;
+
+      if (previousStep < 3) {
+        this.wizard.selectedProductId = null;
+      }
+
+      if (previousStep < 2) {
+        this.filters.category = "All";
+      }
     },
 
     selectWizardProduct(productId) {
@@ -553,7 +607,7 @@ export const useProductStore = defineStore("products", {
       }
 
       this.wizard.selectedProductId = productId;
-      this.wizard.step = 3;
+      this.setWizardStep(3);
     },
 
     completeWizardProductOpen(productId) {
@@ -569,7 +623,7 @@ export const useProductStore = defineStore("products", {
         return;
       }
 
-      this.wizard.step = 4;
+      this.setWizardStep(4);
     },
 
     completeWizardAddToCart(productId) {
@@ -581,19 +635,19 @@ export const useProductStore = defineStore("products", {
         return;
       }
 
-      this.wizard.step = 6;
+      this.setWizardStep(6);
     },
 
-    completeWizardOptions(productId) {
+    completeWizardOptions(productId, selection = {}) {
       if (!this.wizard.active || this.wizard.step !== 4) {
         return;
       }
 
-      if (this.wizard.selectedProductId !== productId) {
+      if (!this.validateWizardOptions(productId, selection)) {
         return;
       }
 
-      this.wizard.step = 5;
+      this.setWizardStep(5);
     },
 
     completeWizardCategory() {
@@ -601,11 +655,11 @@ export const useProductStore = defineStore("products", {
         return;
       }
 
-      if (this.filters.category === "All") {
+      if (!this.validateWizardCategory()) {
         return;
       }
 
-      this.wizard.step = 2;
+      this.setWizardStep(2);
     },
 
     guardProductAccess(productId) {
@@ -656,6 +710,7 @@ export const useProductStore = defineStore("products", {
       this.wizard.active = false;
       this.wizard.step = 1;
       this.wizard.selectedProductId = null;
+      this.wizard.maxStep = 1;
     },
 
     exitWizard() {

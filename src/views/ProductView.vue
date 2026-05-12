@@ -1,6 +1,6 @@
 <template>
-  <section v-if="product" class="page page-product">
-    <nav class="breadcrumbs">
+  <section v-if="product" class="page page-product" :class="{ 'wizard-product-mode': store.wizard.active }">
+    <nav v-if="!store.wizard.active" class="breadcrumbs">
       <RouterLink to="/shop">Shop</RouterLink>
       <span>/</span>
       <RouterLink :to="`/shop?category=${product.category}`">{{ product.category }}</RouterLink>
@@ -8,8 +8,14 @@
       <span>{{ product.name }}</span>
     </nav>
 
+    <section v-if="store.wizard.active" class="wizard-inline-banner wizard-product-banner">
+      <p class="eyebrow">Guided product step</p>
+      <h3>{{ wizardObjective }}</h3>
+      <p>{{ wizardSupport }}</p>
+    </section>
+
     <div class="product-detail-layout">
-      <div class="product-visual">
+      <div class="product-visual" :class="{ 'is-muted': store.wizard.active && !isDetailStep }">
         <img :src="selectedImage" :alt="product.name" loading="eager" decoding="async" fetchpriority="high" />
         <span class="product-chip">{{ product.badge }}</span>
 
@@ -28,7 +34,7 @@
         </div>
       </div>
 
-      <aside class="product-buybox">
+      <aside class="product-buybox" :class="{ 'wizard-detail-lock': store.wizard.active }">
         <p class="eyebrow">{{ product.category }}</p>
         <h1>{{ product.name }}</h1>
         <p class="lead">{{ product.summary }}</p>
@@ -38,7 +44,7 @@
           <span v-if="product.originalPrice">€{{ product.originalPrice }}</span>
         </div>
 
-        <div class="meta-row">
+        <div class="meta-row" :class="{ 'is-deemphasized': store.wizard.active }">
           <span>{{ product.rating.toFixed(1) }} rating</span>
           <span>{{ product.reviews }} reviews</span>
           <span>{{ product.stock }} left</span>
@@ -46,7 +52,7 @@
 
         <div
           class="selection-panel"
-          :class="{ 'wizard-focus': shouldHighlightOptions }"
+          :class="{ 'wizard-focus': shouldHighlightOptions, 'is-muted': store.wizard.active && !shouldHighlightOptions }"
           data-wizard-target="product-options"
         >
           <label class="input-group">
@@ -76,13 +82,17 @@
             <span>Quantity</span>
             <div class="quantity-control">
               <button type="button" @click="decreaseQuantity">−</button>
-              <input v-model.number="quantity" type="number" min="1" :max="product.stock" />
+              <input v-model.number="quantity" type="number" min="1" :max="product.stock" @change="completeOptionStep" />
               <button type="button" @click="increaseQuantity">+</button>
             </div>
           </label>
+
+          <p v-if="store.wizard.active" class="wizard-inline-note">
+            {{ shouldHighlightOptions ? "Choose valid options to unlock the next required action." : "The system is holding this detail page to the current required action." }}
+          </p>
         </div>
 
-        <div class="button-row">
+        <div class="button-row guided-buy-actions">
           <button
             class="button primary-add"
             :class="{ 'wizard-focus': shouldHighlightAdd }"
@@ -93,6 +103,7 @@
             Add {{ quantity }} to cart
           </button>
           <button
+            v-if="!store.wizard.active"
             class="button button-soft"
             type="button"
             :class="{ active: store.comparison.includes(product.id) }"
@@ -100,16 +111,16 @@
           >
             {{ store.comparison.includes(product.id) ? "Remove comparison" : "Compare item" }}
           </button>
-          <RouterLink class="button button-soft" to="/cart">Go to cart</RouterLink>
+          <RouterLink v-if="!store.wizard.active" class="button button-soft" to="/cart">Go to cart</RouterLink>
         </div>
 
-        <p class="support-copy">
-          Free shipping over €180 and a 30-day return policy. This page gives shoppers enough context to move from browsing into buying.
+        <p class="support-copy" :class="{ 'is-deemphasized': store.wizard.active }">
+          {{ store.wizard.active ? "Only the required purchase controls remain visible in guided mode." : "Free shipping over €180 and a 30-day return policy. This page gives shoppers enough context to move from browsing into buying." }}
         </p>
       </aside>
     </div>
 
-    <section class="detail-blocks">
+    <section class="detail-blocks" :class="{ 'is-muted': store.wizard.active }">
       <article class="detail-card">
         <p class="eyebrow">Description</p>
         <p>{{ product.description }}</p>
@@ -125,12 +136,12 @@
       <article class="detail-card">
         <p class="eyebrow">Decision support</p>
         <p>
-          Details, size options, color choices, and comparison support make the product page more useful for realistic shopping tasks.
+          {{ store.wizard.active ? "Background information remains visible but de-emphasized so the current task stays central." : "Details, size options, color choices, and comparison support make the product page more useful for realistic shopping tasks." }}
         </p>
       </article>
     </section>
 
-    <section class="related-section">
+    <section v-if="!store.wizard.active" class="related-section">
       <div class="section-heading">
         <div>
           <p class="eyebrow">You may also like</p>
@@ -189,6 +200,52 @@ const galleryImages = computed(() => {
   return [...new Set([product.value.image, ...siblings])].slice(0, 5)
 })
 
+const relatedProducts = computed(() =>
+  store.products
+    .filter((item) => item.id !== product.value?.id && item.category === product.value?.category)
+    .slice(0, 3),
+)
+
+const shouldHighlightAdd = computed(
+  () =>
+    store.wizard.active &&
+    store.wizard.step === 5 &&
+    store.wizard.selectedProductId === product.value?.id,
+)
+
+const shouldHighlightOptions = computed(
+  () =>
+    store.wizard.active &&
+    store.wizard.step === 4 &&
+    store.wizard.selectedProductId === product.value?.id,
+)
+
+const isDetailStep = computed(() => shouldHighlightOptions.value || shouldHighlightAdd.value)
+
+const wizardObjective = computed(() => {
+  if (store.wizard.step === 4) {
+    return "Choose the product options required to continue."
+  }
+
+  if (store.wizard.step === 5) {
+    return "Add this configured product to the cart."
+  }
+
+  return "Stay on the selected product until the current task is complete."
+})
+
+const wizardSupport = computed(() => {
+  if (store.wizard.step === 4) {
+    return "Color, size, and quantity must be valid before the next action unlocks."
+  }
+
+  if (store.wizard.step === 5) {
+    return "Secondary actions are hidden so the guided purchase remains linear."
+  }
+
+  return "This page is locked to the selected product in guided mode."
+})
+
 watch(
   product,
   (value) => {
@@ -214,26 +271,6 @@ watch(galleryImages, (images) => {
   }
 })
 
-const relatedProducts = computed(() =>
-  store.products
-    .filter((item) => item.id !== product.value?.id && item.category === product.value?.category)
-    .slice(0, 3),
-)
-
-const shouldHighlightAdd = computed(
-  () =>
-    store.wizard.active &&
-    store.wizard.step === 5 &&
-    store.wizard.selectedProductId === product.value?.id,
-)
-
-const shouldHighlightOptions = computed(
-  () =>
-    store.wizard.active &&
-    store.wizard.step === 4 &&
-    store.wizard.selectedProductId === product.value?.id,
-)
-
 watch(
   product,
   (value) => {
@@ -251,6 +288,17 @@ function addToCart() {
     return
   }
 
+  if (
+    store.wizard.active &&
+    !store.validateWizardOptions(product.value.id, {
+      color: selectedColor.value,
+      size: selectedSize.value,
+      quantity: quantity.value,
+    })
+  ) {
+    return
+  }
+
   store.addToCart(product.value.id, quantity.value, selectedColor.value, selectedSize.value)
 }
 
@@ -259,7 +307,11 @@ function completeOptionStep() {
     return
   }
 
-  store.completeWizardOptions(product.value.id)
+  store.completeWizardOptions(product.value.id, {
+    color: selectedColor.value,
+    size: selectedSize.value,
+    quantity: quantity.value,
+  })
 }
 
 function selectSize(size) {

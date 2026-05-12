@@ -32,6 +32,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isGuidedMuted: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const emit = defineEmits(["quick-add", "compare", "select", "blocked-open", "open"])
@@ -186,6 +190,7 @@ function confirmAddToCart() {
       'is-guided-selected': isSelectStep,
       'is-guided-open': isOpenStep,
       'is-editor-open': editorOpen,
+      'is-guided-muted': isGuidedMuted,
     }"
     :data-wizard-target="wizardTarget"
   >
@@ -225,6 +230,7 @@ function confirmAddToCart() {
 
         <div class="product-card-actions">
           <button
+            v-if="!store.wizard.active"
             type="button"
             class="button-soft button-sm"
             :disabled="!canQuickAdd"

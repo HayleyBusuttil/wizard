@@ -1707,6 +1707,11 @@ img {
   box-shadow: 0 24px 42px rgba(35, 45, 68, 0.22);
 }
 
+.product-card-wrapper.is-guided-muted {
+  opacity: 0.45;
+  filter: saturate(0.7);
+}
+
 .wizard-hint {
   margin: 0;
   font-weight: 700;
@@ -1742,6 +1747,88 @@ img {
   margin-bottom: 14px;
   color: #5f677a;
   font-weight: 600;
+}
+
+.wizard-shop-mode .shop-hero.is-muted,
+.wizard-product-mode .detail-blocks.is-muted,
+.wizard-product-mode .product-visual.is-muted,
+.wizard-product-mode .selection-panel.is-muted {
+  opacity: 0.72;
+}
+
+.hero-stats.is-deemphasized,
+.meta-row.is-deemphasized,
+.support-copy.is-deemphasized {
+  opacity: 0.56;
+}
+
+.wizard-task-banner,
+.wizard-product-banner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.wizard-stage-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(35, 45, 68, 0.08);
+  color: var(--accent);
+  font-size: 0.84rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.guided-filters {
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px;
+  border: 1px solid rgba(35, 45, 68, 0.12);
+  border-radius: 22px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 240, 233, 0.9));
+}
+
+.guided-filter-copy {
+  max-width: 38ch;
+}
+
+.guided-filter-copy strong,
+.guided-filter-copy p {
+  margin: 0;
+}
+
+.guided-filter-copy p:last-child {
+  margin-top: 6px;
+  color: var(--muted);
+}
+
+.guided-results {
+  padding: 20px;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.74), rgba(244, 240, 233, 0.66));
+  border: 1px solid rgba(35, 45, 68, 0.08);
+}
+
+.guided-results .product-grid {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 280px));
+  justify-content: start;
+}
+
+.guided-results-note {
+  margin: 18px 0 0;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.wizard-detail-lock {
+  box-shadow: 0 26px 50px rgba(35, 45, 68, 0.12);
+}
+
+.guided-buy-actions {
+  align-items: stretch;
 }
 
 .pagination-bar {
@@ -1840,5 +1927,11 @@ img {
 
   .pagination-controls {
     justify-content: flex-start;
+  }
+
+  .wizard-task-banner,
+  .wizard-product-banner,
+  .guided-filters {
+    flex-direction: column;
   }
 }

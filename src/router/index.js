@@ -18,45 +18,36 @@ const router = createRouter({
 router.beforeEach((to) => {
   const store = useProductStore()
 
-  // If wizard not active → allow everything
-  if (!store.wizard.active) return true
+  if (!store.wizard.active) {
+    return true
+  }
 
-  const step = store.wizard.step
+  const stepRoutes = {
+    1: ["/shop"],
+    2: ["/shop"],
+    3: ["/product"],
+    4: ["/product"],
+    5: ["/product"],
+    6: ["/cart"],
+  }
 
-  // ✅ Define allowed routes per step
- const stepRoutes = {
-  1: ["/shop"],
-  2: ["/shop"],
-  3: ["/product"],
-  4: ["/product"], // options
-  5: ["/product"], // add to cart
-  6: ["/cart"],
-}
+  const allowed = stepRoutes[store.wizard.step] ?? []
+  const isAllowed = allowed.some((path) => to.path.startsWith(path))
 
-  const allowed = stepRoutes[step] || []
+  if (isAllowed) {
+    return true
+  }
 
-  // ✅ Check if current route is allowed
-  const isAllowed = allowed.some((path) =>
-    to.path.startsWith(path)
-  )
-
-  if (isAllowed) return true
-
-  // ✅ Redirect ONLY if needed (prevents loop)
-  switch (step) {
+  switch (store.wizard.step) {
     case 1:
     case 2:
       return "/shop"
-
     case 3:
     case 4:
-      return `/product/${store.wizard.selectedProductId || ""}`
-
     case 5:
-  return `/product/${store.wizard.selectedProductId || ""}`
-
-case 6:
-  return "/cart"
+      return `/product/${store.wizard.selectedProductId || ""}`
+    case 6:
+      return "/cart"
     default:
       return true
   }
