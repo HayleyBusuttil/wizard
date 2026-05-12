@@ -9,9 +9,12 @@
     </nav>
 
     <section v-if="store.wizard.active" class="wizard-inline-banner wizard-product-banner">
-      <p class="eyebrow">Guided product step</p>
-      <h3>{{ wizardObjective }}</h3>
-      <p>{{ wizardSupport }}</p>
+      <div>
+        <p class="eyebrow">Guided product step</p>
+        <h3>{{ wizardObjective }}</h3>
+        <p>{{ wizardSupport }}</p>
+      </div>
+      <span class="wizard-stage-pill">Step {{ store.wizard.step }} / {{ store.wizardSteps.length }}</span>
     </section>
 
     <div class="product-detail-layout">
@@ -55,6 +58,11 @@
           :class="{ 'wizard-focus': shouldHighlightOptions, 'is-muted': store.wizard.active && !shouldHighlightOptions }"
           data-wizard-target="product-options"
         >
+          <div v-if="store.wizard.active" class="option-setup-header">
+            <strong>Customize this item</strong>
+            <span>Required: size and color. Quantity is optional and defaults to 1.</span>
+          </div>
+
           <label class="input-group">
             <span>Color</span>
             <select v-model="selectedColor" @change="completeOptionStep">
@@ -78,13 +86,14 @@
             </div>
           </div>
 
-          <label class="input-group">
+          <label class="input-group optional-quantity">
             <span>Quantity</span>
             <div class="quantity-control">
               <button type="button" @click="decreaseQuantity">−</button>
               <input v-model.number="quantity" type="number" min="1" :max="product.stock" @change="completeOptionStep" />
               <button type="button" @click="increaseQuantity">+</button>
             </div>
+            <small>Optional. Leave at 1 if you only need one item.</small>
           </label>
 
           <p v-if="store.wizard.active" class="wizard-inline-note">

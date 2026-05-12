@@ -1,11 +1,11 @@
 <template>
-  <section class="page page-cart refined-layout">
+  <section class="page page-cart refined-layout" :class="{ 'wizard-cart-mode': store.wizard.active }">
     <header class="shop-hero cart-hero">
       <div>
         <p class="eyebrow">Cart</p>
-        <h1>Review your items and complete checkout.</h1>
+        <h1>{{ heroTitle }}</h1>
         <p class="lead">
-          A flexible simulated checkout where users can review items, choose delivery, and confirm payment details without a forced wizard flow.
+          {{ heroLead }}
         </p>
       </div>
 
@@ -15,46 +15,65 @@
       </div>
     </header>
 
-    <div v-if="store.cartItems.length" class="cart-layout">
-      <section class="cart-list" aria-label="Cart items">
+    <section v-if="store.wizard.active" class="wizard-inline-banner wizard-task-banner">
+      <div>
+        <p class="eyebrow">Current objective</p>
+        <h3>Complete the guided checkout.</h3>
+        <p>Review the selected item, confirm delivery details, and place the simulated order.</p>
+      </div>
+      <span class="wizard-stage-pill">Step {{ store.wizard.step }} / {{ store.wizardSteps.length }}</span>
+    </section>
+
+    <div v-if="store.cartItems.length" class="cart-layout compact-cart-layout">
+      <section class="cart-list compact-cart-list" aria-label="Cart items">
         <article
           v-for="line in store.cartItems"
-          :key="`${line.productId}-${line.color}`"
-          class="cart-item"
+          :key="`${line.productId}-${line.color}-${line.size || 'none'}`"
+          class="cart-item compact-cart-item"
         >
-          <RouterLink :to="`/product/${line.product.id}`" class="cart-item-image">
+          <RouterLink :to="`/product/${line.product.id}`" class="cart-item-image compact-cart-image">
             <img :src="line.product.image" :alt="line.product.name" loading="lazy" decoding="async" />
           </RouterLink>
 
-          <div class="cart-item-content">
-            <div class="cart-item-header">
+          <div class="cart-item-content compact-cart-content">
+            <div class="cart-item-header compact-cart-header">
               <div>
                 <p class="eyebrow">{{ line.product.category }}</p>
                 <h3>{{ line.product.name }}</h3>
               </div>
 
+              <strong class="compact-line-total">{{ formatEuro(line.lineTotal) }}</strong>
+            </div>
+
+            <div class="cart-item-meta compact-cart-meta">
+              <span>Colour: {{ line.color }}</span>
+              <span>Size: {{ line.size || "Standard" }}</span>
+              <span>{{ formatEuro(line.product.price) }} each</span>
+            </div>
+
+            <div class="compact-cart-controls">
+              <div class="quantity-stepper" aria-label="Quantity controls">
+                <button
+                  type="button"
+                  @click="store.updateCartQuantity(line.productId, line.color, line.quantity - 1, line.size)"
+                >
+                  −
+                </button>
+                <span>{{ line.quantity }}</span>
+                <button
+                  type="button"
+                  @click="store.updateCartQuantity(line.productId, line.color, line.quantity + 1, line.size)"
+                >
+                  +
+                </button>
+              </div>
+
               <button
-                class="text-button"
+                class="text-button compact-remove"
                 type="button"
-                @click="store.removeFromCart(line.productId, line.color)"
+                @click="store.removeFromCart(line.productId, line.color, line.size)"
               >
                 Remove
-              </button>
-            </div>
-
-            <div class="cart-item-meta">
-              <span>Color: {{ line.color }}</span>
-              <span>{{ formatEuro(line.product.price) }} each</span>
-              <span>{{ formatEuro(line.lineTotal) }} line total</span>
-            </div>
-
-            <div class="quantity-stepper" aria-label="Quantity controls">
-              <button type="button" @click="store.updateCartQuantity(line.productId, line.color, line.quantity - 1)">
-                −
-              </button>
-              <span>{{ line.quantity }}</span>
-              <button type="button" @click="store.updateCartQuantity(line.productId, line.color, line.quantity + 1)">
-                +
               </button>
             </div>
           </div>
@@ -62,7 +81,7 @@
       </section>
 
       <aside
-        class="checkout-panel"
+        class="checkout-panel compact-checkout-panel"
         :class="{ 'wizard-focus': store.wizard.active && store.wizard.step === 6 }"
         data-wizard-target="checkout-panel"
       >
@@ -265,6 +284,16 @@ const cartSummaryText = computed(() => {
   const itemLabel = store.cartCount === 1 ? "item" : "items"
   return `${itemLabel} in your bag`
 })
+
+const heroTitle = computed(() =>
+  store.wizard.active ? "Finish the guided purchase." : "Review your items and complete checkout.",
+)
+
+const heroLead = computed(() =>
+  store.wizard.active
+    ? "The guided panel remains active while checkout stays focused on the final required task."
+    : "A flexible simulated checkout where users can review items, choose delivery, and confirm payment details without a forced wizard flow.",
+)
 
 const deliveryComplete = computed(() => Boolean(form.name && form.email && form.address))
 const paymentComplete = computed(() => Boolean(form.cardNumber && form.expiry && form.cvv))
