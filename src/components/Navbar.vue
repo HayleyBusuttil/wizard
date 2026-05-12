@@ -66,11 +66,11 @@ function isLocked(path) {
     return path !== "/shop"
   }
 
-  if (store.wizard.step <= 4) {
-    return true
+  if (store.wizard.step === 3) {
+    return path !== "/shop"
   }
 
-  if (store.wizard.step === 5) {
+  if (store.wizard.step <= 6) {
     return path !== "/product"
   }
 

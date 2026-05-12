@@ -44,10 +44,10 @@ const router = useRouter()
 const store = useProductStore()
 
 const isSelectStep = computed(() => store.wizard.active && store.wizard.step === 2)
-const isOpenStep = computed(() => store.wizard.active && store.wizard.step === 3 && props.isWizardSelected)
+const isOpenStep = computed(() => store.wizard.active && store.wizard.step === 4 && props.isWizardSelected)
 const canQuickAdd = computed(() => !store.wizard.active || store.wizard.step >= 4)
 const wizardTarget = computed(() => {
-  if (props.isWizardSelected && store.wizard.active && store.wizard.step === 3) {
+  if (props.isWizardSelected && store.wizard.active && store.wizard.step === 4) {
     return "wizard-selected-product"
   }
 
@@ -55,12 +55,18 @@ const wizardTarget = computed(() => {
 })
 
 const helperText = computed(() => {
-  if (props.isWizardSelected && store.wizard.active && store.wizard.step === 3) {
+  if (props.isWizardSelected && store.wizard.active && store.wizard.step === 4) {
     return "Selected. Open this product to continue."
   }
 
   if (isSelectStep.value && props.showSelectAction) {
     return "Click Select to continue."
+  }
+
+  if (store.wizard.active && store.wizard.step === 3) {
+    return props.isCompared
+      ? "In comparison. Add one more item or continue when two products are selected."
+      : "Compare one more product before opening the guided item."
   }
 
   if (store.wizard.active && store.wizard.step < 4) {

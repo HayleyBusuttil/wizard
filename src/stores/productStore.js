@@ -183,21 +183,26 @@ export const useProductStore = defineStore("products", {
       },
       {
         step: 3,
+        title: "Compare products",
+        description: "Add one more product to compare against your selection",
+      },
+      {
+        step: 4,
         title: "Open product",
         description: "View the selected product",
       },
       {
-        step: 4,
+        step: 5,
         title: "Choose options",
         description: "Select size and color before continuing",
       },
       {
-        step: 5,
+        step: 6,
         title: "Add to cart",
         description: "Add the configured product to your cart",
       },
       {
-        step: 6,
+        step: 7,
         title: "Checkout",
         description: "Proceed to checkout",
       },
@@ -380,7 +385,7 @@ export const useProductStore = defineStore("products", {
       }
 
       if (this.wizard.active) {
-        if (this.wizard.step < 5) {
+        if (this.wizard.step < 6) {
           this.showToast(
             "Follow guided mode: choose the product options before adding to cart",
             "warning",
@@ -424,8 +429,8 @@ export const useProductStore = defineStore("products", {
       });
       this.showToast(`${product.name} added to cart`);
 
-      if (this.wizard.active && this.wizard.step === 5) {
-        this.setWizardStep(6);
+      if (this.wizard.active && this.wizard.step === 6) {
+        this.setWizardStep(7);
       }
     },
     updateCartQuantity(productId, color, quantity, size = null) {
@@ -545,6 +550,28 @@ export const useProductStore = defineStore("products", {
       this.wizard.maxStep = Math.max(this.wizard.maxStep, step);
     },
 
+    validateWizardComparison() {
+      if (!this.wizard.selectedProductId) {
+        this.showToast("Choose a guided product before comparing", "warning");
+        return false;
+      }
+
+      if (!this.comparison.includes(this.wizard.selectedProductId)) {
+        this.showToast(
+          "Keep the selected guided product in the comparison tray",
+          "warning",
+        );
+        return false;
+      }
+
+      if (this.comparison.length < 2) {
+        this.showToast("Choose one more product to complete comparison", "warning");
+        return false;
+      }
+
+      return true;
+    },
+
     validateWizardCategory() {
       if (this.filters.category === "All") {
         this.showToast("Choose a category to continue", "warning");
@@ -582,8 +609,17 @@ export const useProductStore = defineStore("products", {
       const previousStep = this.wizard.step - 1;
       this.wizard.step = previousStep;
 
+      if (previousStep < 4) {
+        this.comparison = this.wizard.selectedProductId
+          ? [this.wizard.selectedProductId]
+          : [];
+        persistJSON(compareStorageKey, this.comparison);
+      }
+
       if (previousStep < 3) {
         this.wizard.selectedProductId = null;
+        this.comparison = [];
+        persistJSON(compareStorageKey, this.comparison);
       }
 
       if (previousStep < 2) {
@@ -607,11 +643,13 @@ export const useProductStore = defineStore("products", {
       }
 
       this.wizard.selectedProductId = productId;
+      this.comparison = [productId];
+      persistJSON(compareStorageKey, this.comparison);
       this.setWizardStep(3);
     },
 
     completeWizardProductOpen(productId) {
-      if (!this.wizard.active || this.wizard.step !== 3) {
+      if (!this.wizard.active || this.wizard.step !== 4) {
         return;
       }
 
@@ -623,11 +661,11 @@ export const useProductStore = defineStore("products", {
         return;
       }
 
-      this.setWizardStep(4);
+      this.setWizardStep(5);
     },
 
     completeWizardAddToCart(productId) {
-      if (!this.wizard.active || this.wizard.step !== 5) {
+      if (!this.wizard.active || this.wizard.step !== 6) {
         return;
       }
 
@@ -635,11 +673,11 @@ export const useProductStore = defineStore("products", {
         return;
       }
 
-      this.setWizardStep(6);
+      this.setWizardStep(7);
     },
 
     completeWizardOptions(productId, selection = {}) {
-      if (!this.wizard.active || this.wizard.step !== 4) {
+      if (!this.wizard.active || this.wizard.step !== 5) {
         return;
       }
 
@@ -647,7 +685,39 @@ export const useProductStore = defineStore("products", {
         return;
       }
 
-      this.setWizardStep(5);
+      this.setWizardStep(6);
+    },
+
+    completeWizardComparison() {
+      if (!this.wizard.active || this.wizard.step !== 3) {
+        return;
+      }
+
+      if (!this.validateWizardComparison()) {
+        return;
+      }
+
+      this.showToast("Choose one of the compared products to view its details");
+    },
+
+    chooseWizardComparisonProduct(productId) {
+      if (!this.wizard.active || this.wizard.step !== 3) {
+        return false;
+      }
+
+      if (!this.validateWizardComparison()) {
+        return false;
+      }
+
+      if (!this.comparison.includes(productId)) {
+        this.showToast("Choose a product from the comparison tray", "warning");
+        return false;
+      }
+
+      this.wizard.selectedProductId = productId;
+      this.setWizardStep(4);
+
+      return true;
     },
 
     completeWizardCategory() {
@@ -667,16 +737,16 @@ export const useProductStore = defineStore("products", {
         return true;
       }
 
-      if (this.wizard.step < 3) {
+      if (this.wizard.step < 4) {
         this.showToast(
-          "Follow guided mode: choose category and select a product first",
+          "Follow guided mode: choose category, select a product, and complete comparison first",
           "warning",
         );
         return false;
       }
 
       if (
-        this.wizard.step === 3 &&
+        this.wizard.step === 4 &&
         this.wizard.selectedProductId &&
         this.wizard.selectedProductId !== productId
       ) {
@@ -695,7 +765,7 @@ export const useProductStore = defineStore("products", {
         return true;
       }
 
-      if (this.wizard.step < 6) {
+      if (this.wizard.step < 7) {
         this.showToast(
           "Follow guided mode: add the selected product to cart before checkout",
           "warning",
@@ -711,6 +781,8 @@ export const useProductStore = defineStore("products", {
       this.wizard.step = 1;
       this.wizard.selectedProductId = null;
       this.wizard.maxStep = 1;
+      this.comparison = [];
+      persistJSON(compareStorageKey, this.comparison);
     },
 
     exitWizard() {

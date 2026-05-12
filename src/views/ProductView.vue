@@ -204,6 +204,10 @@ const galleryImages = computed(() => {
     return []
   }
 
+  if (store.wizard.active) {
+    return [product.value.image]
+  }
+
   const siblings = store.products
     .filter((item) => item.collection === product.value.collection)
     .map((item) => item.image)
@@ -220,25 +224,25 @@ const relatedProducts = computed(() =>
 const shouldHighlightAdd = computed(
   () =>
     store.wizard.active &&
-    store.wizard.step === 5 &&
+    store.wizard.step === 6 &&
     store.wizard.selectedProductId === product.value?.id,
 )
 
 const shouldHighlightOptions = computed(
   () =>
     store.wizard.active &&
-    store.wizard.step === 4 &&
+    store.wizard.step === 5 &&
     store.wizard.selectedProductId === product.value?.id,
 )
 
 const isDetailStep = computed(() => shouldHighlightOptions.value || shouldHighlightAdd.value)
 
 const wizardObjective = computed(() => {
-  if (store.wizard.step === 4) {
+  if (store.wizard.step === 5) {
     return "Choose the product options required to continue."
   }
 
-  if (store.wizard.step === 5) {
+  if (store.wizard.step === 6) {
     return "Add this configured product to the cart."
   }
 
@@ -246,11 +250,11 @@ const wizardObjective = computed(() => {
 })
 
 const wizardSupport = computed(() => {
-  if (store.wizard.step === 4) {
+  if (store.wizard.step === 5) {
     return "Color, size, and quantity must be valid before the next action unlocks."
   }
 
-  if (store.wizard.step === 5) {
+  if (store.wizard.step === 6) {
     return "Secondary actions are hidden so the guided purchase remains linear."
   }
 
@@ -318,7 +322,7 @@ function completeOptionStep() {
     return
   }
 
-  if (!store.wizard.active || store.wizard.step !== 4) {
+  if (!store.wizard.active || store.wizard.step !== 5) {
     return
   }
 

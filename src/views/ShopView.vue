@@ -84,7 +84,7 @@
 
     <section
       class="products-section"
-      :class="{ 'wizard-focus': isStep(2) || isStep(3), 'guided-results': store.wizard.active }"
+      :class="{ 'wizard-focus': isStep(2) || isStep(3) || isStep(4), 'guided-results': store.wizard.active }"
     >
       <div class="section-heading">
         <div>
@@ -104,7 +104,7 @@
           :product="product"
           :is-compared="store.comparison.includes(product.id)"
           :compare-disabled="store.comparison.length >= 2"
-          :show-compare-action="!store.wizard.active"
+          :show-compare-action="!store.wizard.active || isStep(3)"
           :show-select-action="isStep(2)"
           :is-wizard-selected="store.wizard.selectedProductId === product.id"
           :open-locked="isProductOpenLocked(product.id)"
@@ -153,10 +153,18 @@
       </div>
     </section>
 
-    <section v-if="!store.wizard.active && store.comparisonProducts.length" class="compare-tray">
+    <section
+      v-if="store.comparisonProducts.length && (!store.wizard.active || isStep(3))"
+      class="compare-tray"
+      :class="{ 'wizard-focus': isStep(3) }"
+      data-wizard-target="compare-products"
+    >
       <div>
-        <p class="eyebrow">Compare</p>
+        <p class="eyebrow">{{ store.wizard.active ? "Guided comparison" : "Compare" }}</p>
         <h2>{{ store.comparisonProducts.length }}/2 products selected</h2>
+        <p v-if="isStep(3)" class="wizard-inline-note">
+          {{ comparisonInstruction }}
+        </p>
       </div>
 
       <div class="compare-items">
@@ -166,8 +174,21 @@
             <strong>{{ item.name }}</strong>
             <span>{{ item.category }} · €{{ item.price }}</span>
           </div>
-          <button type="button" class="text-button" @click="store.toggleComparison(item.id)">
+          <button
+            type="button"
+            class="text-button"
+            :disabled="isStep(3) && item.id === store.wizard.selectedProductId"
+            @click="store.toggleComparison(item.id)"
+          >
             Remove
+          </button>
+          <button
+            v-if="isStep(3) && store.comparisonProducts.length === 2"
+            type="button"
+            class="button button-sm compare-open-button"
+            @click="openComparedProduct(item.id)"
+          >
+            Open details
           </button>
         </article>
       </div>
@@ -200,9 +221,11 @@
 
 <script setup>
 import { computed, ref, watch } from "vue"
+import { useRouter } from "vue-router"
 import { useProductStore } from "../stores/productStore"
 import ProductCard from "../components/ProductCard.vue"
 
+const router = useRouter()
 const store = useProductStore()
 const standardProductsPerPage = 12
 const guidedProductsPerPage = 4
@@ -220,10 +243,11 @@ const wizardInstruction = computed(() => {
   const instructions = {
     1: "Choose a category to begin browsing.",
     2: "Select one product to continue.",
-    3: "Open the selected product card.",
-    4: "Choose the required product options.",
-    5: "Add the configured product to cart.",
-    6: "Complete the checkout form.",
+    3: "Compare two products, then choose one from the tray to open.",
+    4: "Open the selected product card.",
+    5: "Choose the required product options.",
+    6: "Add the configured product to cart.",
+    7: "Complete the checkout form.",
   }
 
   return instructions[store.wizard.step] ?? "Follow the guided shopping flow."
@@ -233,10 +257,11 @@ const wizardSupport = computed(() => {
   const support = {
     1: "The system is waiting for a category choice before anything else becomes available.",
     2: "Only a small set of products is shown to keep the decision focused.",
-    3: "Only the selected product can be opened during this step.",
-    4: "Choose color, size, and quantity before you can continue.",
-    5: "Secondary actions are hidden so the add-to-cart task stays central.",
-    6: "Checkout is now the only remaining task in the guided journey.",
+    3: "Once two products are in the tray, choose one there to continue into the detail page.",
+    4: "Only the selected product can be opened during this step.",
+    5: "Choose color, size, and quantity before you can continue.",
+    6: "Secondary actions are hidden so the add-to-cart task stays central.",
+    7: "Checkout is now the only remaining task in the guided journey.",
   }
 
   return support[store.wizard.step] ?? "Use the visible guidance to continue."
@@ -270,6 +295,14 @@ const sectionSupport = computed(() => {
   }
 
   return wizardSupport.value
+})
+
+const comparisonInstruction = computed(() => {
+  if (store.comparisonProducts.length < 2) {
+    return "Add one more product to compare against the selected guided item."
+  }
+
+  return "Review the comparison below, then choose which product to open for more details."
 })
 
 let timeout = null
@@ -377,23 +410,23 @@ const isProductOpenLocked = (productId) => {
     return false
   }
 
-  if (store.wizard.step <= 2) {
+  if (store.wizard.step <= 3) {
     return true
   }
 
-  return store.wizard.step === 3 && store.wizard.selectedProductId !== productId
+  return store.wizard.step === 4 && store.wizard.selectedProductId !== productId
 }
 
 const shouldMuteProduct = (productId) =>
-  store.wizard.step === 3 && store.wizard.selectedProductId && store.wizard.selectedProductId !== productId
+  store.wizard.step === 4 && store.wizard.selectedProductId && store.wizard.selectedProductId !== productId
 
 const handleBlockedOpen = () => {
   if (!store.wizard.active) {
     return
   }
 
-  if (store.wizard.step <= 2) {
-    store.showToast("Follow guided mode: choose a category and select a product first", "warning")
+  if (store.wizard.step <= 3) {
+    store.showToast("Follow guided mode: choose a category, select a product, and complete comparison first", "warning")
     return
   }
 
@@ -401,8 +434,14 @@ const handleBlockedOpen = () => {
 }
 
 const handleProductOpen = (productId) => {
-  if (store.wizard.active && store.wizard.step === 3 && store.wizard.selectedProductId !== productId) {
+  if (store.wizard.active && store.wizard.step === 4 && store.wizard.selectedProductId !== productId) {
     store.showToast("Follow guided mode: open the selected product", "warning")
+  }
+}
+
+const openComparedProduct = (productId) => {
+  if (store.chooseWizardComparisonProduct(productId)) {
+    router.push(`/product/${productId}`)
   }
 }
 

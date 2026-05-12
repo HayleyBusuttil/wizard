@@ -25,10 +25,11 @@ router.beforeEach((to) => {
   const stepRoutes = {
     1: ["/shop"],
     2: ["/shop"],
-    3: ["/product"],
+    3: ["/shop"],
     4: ["/product"],
     5: ["/product"],
-    6: ["/cart"],
+    6: ["/product"],
+    7: ["/cart"],
   }
 
   const allowed = stepRoutes[store.wizard.step] ?? []
@@ -41,12 +42,13 @@ router.beforeEach((to) => {
   switch (store.wizard.step) {
     case 1:
     case 2:
-      return "/shop"
     case 3:
+      return "/shop"
     case 4:
     case 5:
-      return `/product/${store.wizard.selectedProductId || ""}`
     case 6:
+      return `/product/${store.wizard.selectedProductId || ""}`
+    case 7:
       return "/cart"
     default:
       return true

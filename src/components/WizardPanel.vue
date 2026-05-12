@@ -89,24 +89,30 @@ const stepMap = {
     route: "/shop",
   },
   3: {
+    selector: '[data-wizard-target="compare-products"]',
+    title: "Compare products",
+    copy: "Add one more product to the comparison tray before opening the guided product.",
+    route: "/shop",
+  },
+  4: {
     selector: '[data-wizard-target="wizard-selected-product"]',
     title: "Open product",
     copy: "Open the selected product card to continue.",
     route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
-  4: {
+  5: {
     selector: '[data-wizard-target="product-options"]',
     title: "Choose options",
     copy: "Choose valid product options before the add-to-cart step unlocks.",
     route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
-  5: {
+  6: {
     selector: '[data-wizard-target="add-to-cart"]',
     title: "Add to cart",
     copy: "Add the configured item from the product page to continue.",
     route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
-  6: {
+  7: {
     selector: '[data-wizard-target="checkout-panel"]',
     title: "Checkout",
     copy: "Review the cart and complete the simulated checkout form.",

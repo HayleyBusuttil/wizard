@@ -1533,6 +1533,13 @@ img {
   font-size: 0.92rem;
 }
 
+.compare-open-button {
+  grid-column: 1 / -1;
+  width: min(280px, 100%);
+  justify-self: center;
+  margin-top: 2px;
+}
+
 .comparison-table {
   display: grid;
   overflow: hidden;
@@ -1982,6 +1989,11 @@ img {
   .compare-mini-card .text-button {
     grid-column: 1 / -1;
     justify-self: start;
+  }
+
+  .compare-open-button {
+    width: 100%;
+    justify-self: stretch;
   }
 
   .cart-item {

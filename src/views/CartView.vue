@@ -82,7 +82,7 @@
 
       <aside
         class="checkout-panel compact-checkout-panel"
-        :class="{ 'wizard-focus': store.wizard.active && store.wizard.step === 6 }"
+        :class="{ 'wizard-focus': store.wizard.active && store.wizard.step === 7 }"
         data-wizard-target="checkout-panel"
       >
         <div class="summary-card cart-section">
@@ -110,8 +110,8 @@
         </div>
 
         <form class="checkout-flow" @submit.prevent="completeCheckout">
-          <p v-if="store.wizard.active && store.wizard.step === 6" class="form-hint wizard-hint">
-            Guided mode step 6: complete checkout below.
+          <p v-if="store.wizard.active && store.wizard.step === 7" class="form-hint wizard-hint">
+            Guided mode step 7: complete checkout below.
           </p>
           <section class="checkout-section">
             <div class="checkout-section-heading">
