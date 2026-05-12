@@ -714,6 +714,11 @@ export const useProductStore = defineStore("products", {
     },
 
     exitWizard() {
+      if (this.wizard.active) {
+        this.showToast("Complete the guided checkout to unlock free browsing", "warning");
+        return;
+      }
+
       this.resetWizard();
 
       this.toast = {

@@ -1779,7 +1779,7 @@ img {
   position: relative;
   z-index: 2;
   border-radius: 22px;
-  box-shadow: 0 0 0 2px rgba(35, 45, 68, 0.18), 0 16px 30px rgba(35, 45, 68, 0.1);
+  box-shadow: 0 0 0 3px rgba(35, 45, 68, 0.42), 0 16px 30px rgba(35, 45, 68, 0.14);
 }
 
 .product-card.is-wizard-selected {

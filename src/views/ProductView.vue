@@ -97,7 +97,7 @@
           </label>
 
           <p v-if="store.wizard.active" class="wizard-inline-note">
-            {{ shouldHighlightOptions ? "Choose valid options to unlock the next required action." : "The system is holding this detail page to the current required action." }}
+            {{ shouldHighlightOptions ? "Choose valid options to unlock the next required action. Your selection will remain visible briefly before the wizard advances." : "The system is holding this detail page to the current required action." }}
           </p>
         </div>
 
@@ -182,7 +182,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue"
+import { computed, onBeforeUnmount, ref, watch } from "vue"
 import { useRoute } from "vue-router"
 import { useProductStore } from "../stores/productStore"
 import ProductCard from "../components/ProductCard.vue"
@@ -196,6 +196,8 @@ const quantity = ref(1)
 const selectedColor = ref("")
 const selectedSize = ref("M")
 const selectedImage = ref("")
+const optionAdvanceDelayMs = 1500
+let optionStepTimeout = null
 
 const galleryImages = computed(() => {
   if (!product.value) {
@@ -316,11 +318,21 @@ function completeOptionStep() {
     return
   }
 
-  store.completeWizardOptions(product.value.id, {
-    color: selectedColor.value,
-    size: selectedSize.value,
-    quantity: quantity.value,
-  })
+  if (!store.wizard.active || store.wizard.step !== 4) {
+    return
+  }
+
+  if (optionStepTimeout) {
+    window.clearTimeout(optionStepTimeout)
+  }
+
+  optionStepTimeout = window.setTimeout(() => {
+    store.completeWizardOptions(product.value.id, {
+      color: selectedColor.value,
+      size: selectedSize.value,
+      quantity: quantity.value,
+    })
+  }, optionAdvanceDelayMs)
 }
 
 function selectSize(size) {
@@ -341,4 +353,10 @@ function decreaseQuantity() {
   quantity.value = Math.max(1, quantity.value - 1)
   completeOptionStep()
 }
+
+onBeforeUnmount(() => {
+  if (optionStepTimeout) {
+    window.clearTimeout(optionStepTimeout)
+  }
+})
 </script>

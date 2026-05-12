@@ -32,14 +32,9 @@
         >
           Back a step
         </button>
-        <button
-          v-if="store.wizard.active"
-          type="button"
-          class="button-soft button-sm"
-          @click="store.exitWizard()"
-        >
-          Exit guided mode
-        </button>
+        <p v-if="store.wizard.active" class="wizard-lock-note">
+          Complete the guided flow to unlock full site access.
+        </p>
         <button v-else type="button" class="button button-sm" @click="startWizard()">
           Start guided mode
         </button>
@@ -274,22 +269,24 @@ onBeforeUnmount(() => {
 .wizard-panel-shell {
   position: sticky;
   top: 18px;
-  z-index: 12;
+  z-index: 20;
+  isolation: isolate;
   width: min(calc(100% - 32px), 1200px);
   margin: 16px auto 0;
 }
 
 .wizard-panel-card {
+  position: relative;
+  z-index: 2;
   display: grid;
   gap: 16px;
   padding: 20px 22px;
-  border: 1px solid rgba(35, 45, 68, 0.12);
+  border: 1px solid rgba(35, 45, 68, 0.28);
   border-radius: 24px;
   background:
-    linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(246, 242, 235, 0.94)),
-    rgba(255, 255, 255, 0.9);
-  box-shadow: 0 18px 38px rgba(35, 45, 68, 0.08);
-  backdrop-filter: blur(14px);
+    linear-gradient(135deg, #ffffff, #f6f2eb),
+    #ffffff;
+  box-shadow: 0 18px 38px rgba(35, 45, 68, 0.12);
 }
 
 .wizard-panel-header {
@@ -371,6 +368,13 @@ onBeforeUnmount(() => {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
+  align-items: center;
+}
+
+.wizard-lock-note {
+  margin: 0;
+  color: #5f677a;
+  font-weight: 600;
 }
 
 .wizard-step-list {
@@ -440,13 +444,12 @@ onBeforeUnmount(() => {
   position: fixed;
   inset: 0;
   pointer-events: none;
-  z-index: 11;
+  z-index: 10;
 }
 
 .wizard-overlay-piece {
   position: fixed;
-  background: rgba(243, 242, 240, 0.42);
-  backdrop-filter: blur(3px);
+  background: rgba(243, 242, 240, 0.12);
 }
 
 @media (max-width: 720px) {
