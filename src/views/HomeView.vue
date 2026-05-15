@@ -12,7 +12,7 @@
       <div class="hero-editorial-overlay"></div>
 
       <div class="hero-editorial-content">
-        <p class="hero-kicker">TEST</p>
+        <p class="hero-kicker">Spring / Summer 2026</p>
         <h1>Minimal Style.<br />Maximum Presence.</h1>
         <RouterLink class="button button-editorial" to="/shop">Shop Collection</RouterLink>
       </div>

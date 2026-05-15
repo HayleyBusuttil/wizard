@@ -2,7 +2,7 @@
   <section class="page page-shop refined-layout" :class="{ 'wizard-shop-mode': store.wizard.active }">
     <header class="shop-hero" :class="{ 'is-muted': store.wizard.active }">
       <div>
-        <p class="eyebrow">Shop</p>
+        <p class="eyebrow">TEST</p>
         <h1>{{ heroTitle }}</h1>
         <p class="lead">
           {{ heroLead }}
