@@ -16,33 +16,17 @@
         <router-view />
       </main>
     </div>
-
-    <transition name="fade">
-      <div v-if="store.toast" class="guided-toast">
-        <div class="guided-toast-content">
-          <strong>
-            {{ store.toast.title || "Guided step" }}
-          </strong>
-
-          <p>
-            {{ store.toast.message }}
-          </p>
-
-          <button @click="store.dismissToast()">Got it</button>
-        </div>
-      </div>
-    </transition>
+    <AppToast />
   </div>
 </template>
 
 <script setup>
 import { computed } from "vue"
 import { useRoute } from "vue-router"
+import AppToast from "./components/AppToast.vue"
 import Navbar from "./components/Navbar.vue"
 import WizardPanel from "./components/WizardPanel.vue"
-import { useProductStore } from "./stores/productStore"
 
-const store = useProductStore()
 const route = useRoute()
 const showWizardPanel = computed(() => route.path !== "/")
 </script>
@@ -51,7 +35,7 @@ const showWizardPanel = computed(() => route.path !== "/")
 .app-content-shell {
   position: relative;
   z-index: 1;
-  padding-top: 108px;
+  padding-top: 88px;
 }
 
 .app-content-shell.has-wizard {
@@ -69,7 +53,7 @@ const showWizardPanel = computed(() => route.path !== "/")
 
 .app-wizard-rail {
   position: fixed;
-  top: 110px;
+  top: 92px;
   left: max(10px, calc((100vw - min(1480px, calc(100vw - 20px))) / 2));
   width: 320px;
   z-index: 30;
@@ -93,66 +77,9 @@ const showWizardPanel = computed(() => route.path !== "/")
   padding: 0.75rem 0 2rem;
 }
 
-.guided-toast {
-  position: fixed;
-  bottom: 28px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 50;
-}
-
-.guided-toast-content {
-  background: #ffffff;
-  border: 1px solid rgba(35, 45, 68, 0.12);
-  padding: 16px 20px;
-  border-radius: 18px;
-  box-shadow: 0 20px 40px rgba(35, 45, 68, 0.15);
-  max-width: 420px;
-  text-align: center;
-  backdrop-filter: blur(12px);
-}
-
-.guided-toast-content strong {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 1rem;
-  color: #232d44;
-}
-
-.guided-toast-content p {
-  margin: 0 0 10px;
-  color: #666;
-  font-size: 0.95rem;
-}
-
-.guided-toast-content button {
-  border: none;
-  background: #232d44;
-  color: white;
-  padding: 8px 14px;
-  border-radius: 999px;
-  cursor: pointer;
-  font-weight: 600;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: all 0.25s ease;
-}
-
-.fade-enter-from {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.fade-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
 @media (max-width: 1024px) {
   .app-content-shell {
-    padding-top: 132px;
+    padding-top: 124px;
   }
 
   .app-content-shell.has-wizard {

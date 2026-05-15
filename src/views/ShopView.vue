@@ -9,11 +9,6 @@
         </p>
       </div>
 
-      <div class="hero-stats" :class="{ 'is-deemphasized': store.wizard.active }">
-        <span>{{ visibleResultsCount }} visible</span>
-        <span>{{ store.products.length }} items total</span>
-        <span>{{ store.cartCount }} in cart</span>
-      </div>
     </header>
 
     <section v-if="store.wizard.active" class="wizard-inline-banner wizard-task-banner">
@@ -286,9 +281,6 @@ const wizardSupport = computed(() => {
   return support[store.wizard.step] ?? "Use the visible guidance to continue."
 })
 
-const heroTitle = computed(() =>
-  store.wizard.active ? "Follow the guided steps." : "Discover your next outfit.",
-)
 
 const heroLead = computed(() =>
   store.wizard.active

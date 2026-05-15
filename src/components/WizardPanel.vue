@@ -81,44 +81,37 @@ const stepItemRefs = new Map()
 const stepMap = {
   1: {
     selector: '[data-wizard-target="category-select"]',
-    title: "Choose category",
-    copy: "Choose a category.",
+    title: "Choose a category",
     route: "/shop",
   },
   2: {
     selector: '[data-wizard-target="product-grid"]',
-    title: "Select product",
-    copy: "Pick one product.",
+    title: "Select one product",
     route: "/shop",
   },
   3: {
     selector: '[data-wizard-target="compare-products"]',
-    title: "Compare products",
-    copy: "Compare two products.",
+    title: "Compare two products",
     route: "/shop",
   },
   4: {
     selector: '[data-wizard-target="wizard-selected-product"]',
-    title: "Open product",
-    copy: "Open the chosen product.",
+    title: "Open the selected product",
     route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
   5: {
     selector: '[data-wizard-target="product-options"]',
-    title: "Choose options",
-    copy: "Choose the options.",
+    title: "Fill the product options",
     route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
   6: {
     selector: '[data-wizard-target="add-to-cart"]',
-    title: "Add to cart",
-    copy: "Add it to cart.",
+    title: "Add product to cart",
     route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
   7: {
     selector: '[data-wizard-target="checkout-panel"]',
-    title: "Checkout",
-    copy: "Finish checkout.",
+    title: "Go to checkout",
     route: "/cart",
   },
 }
@@ -338,13 +331,13 @@ onBeforeUnmount(() => {
   gap: 16px;
   max-height: min(calc(100dvh - 114px), 760px);
   padding: 20px 22px;
-  border: 1px solid rgba(35, 45, 68, 0.18);
+  border: 1px solid rgba(47, 79, 103, 0.14);
   border-radius: 28px;
   background:
-    radial-gradient(circle at top right, rgba(24, 116, 110, 0.12), transparent 28%),
-    linear-gradient(135deg, #ffffff, #f0ece5),
+    radial-gradient(circle at top right, rgba(24, 116, 110, 0.07), transparent 28%),
+    linear-gradient(135deg, #ffffff, #f7f3ed),
     #ffffff;
-  box-shadow: 0 24px 50px rgba(35, 45, 68, 0.16);
+  box-shadow: 0 14px 30px rgba(35, 45, 68, 0.08);
   overflow: hidden;
 }
 
@@ -379,12 +372,12 @@ onBeforeUnmount(() => {
   justify-content: center;
   padding: 8px 12px;
   border-radius: 999px;
-  background: linear-gradient(135deg, #18746e, #232d44);
+  background: linear-gradient(135deg, #2f5f67, #405365);
   color: #f7f5f1;
   font-size: 0.88rem;
   font-weight: 700;
   white-space: nowrap;
-  box-shadow: 0 10px 24px rgba(24, 116, 110, 0.22);
+  box-shadow: 0 8px 18px rgba(47, 79, 103, 0.14);
 }
 
 .wizard-panel-copy {
@@ -399,9 +392,9 @@ onBeforeUnmount(() => {
   padding: 14px 16px;
   border-radius: 22px;
   background:
-    linear-gradient(135deg, rgba(24, 116, 110, 0.08), rgba(255, 255, 255, 0.96)),
-    rgba(35, 45, 68, 0.08);
-  border: 1px solid rgba(24, 116, 110, 0.14);
+    linear-gradient(135deg, rgba(24, 116, 110, 0.04), rgba(255, 255, 255, 0.96)),
+    rgba(47, 79, 103, 0.04);
+  border: 1px solid rgba(47, 79, 103, 0.12);
 }
 
 .wizard-progress-meta {
@@ -425,13 +418,13 @@ onBeforeUnmount(() => {
   height: 12px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(35, 45, 68, 0.12);
+  background: rgba(47, 79, 103, 0.1);
 }
 
 .wizard-progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #18746e 0%, #232d44 100%);
+  background: linear-gradient(90deg, #2f5f67 0%, #405365 100%);
   transition: width 220ms ease;
 }
 
@@ -475,7 +468,7 @@ onBeforeUnmount(() => {
   padding: 14px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(35, 45, 68, 0.1);
+  border: 1px solid rgba(47, 79, 103, 0.08);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
   position: relative;
 }
@@ -514,23 +507,23 @@ onBeforeUnmount(() => {
 }
 
 .wizard-step-item.is-current {
-  border-color: rgba(24, 116, 110, 0.34);
-  background: linear-gradient(180deg, rgba(24, 116, 110, 0.16), rgba(24, 116, 110, 0.05));
-  box-shadow: 0 16px 30px rgba(24, 116, 110, 0.14);
+  border-color: rgba(47, 79, 103, 0.2);
+  background: linear-gradient(180deg, rgba(24, 116, 110, 0.08), rgba(24, 116, 110, 0.02));
+  box-shadow: 0 10px 22px rgba(47, 79, 103, 0.08);
 }
 
 .wizard-step-item.is-current .wizard-step-number {
-  background: linear-gradient(135deg, #18746e, #232d44);
+  background: linear-gradient(135deg, #2f5f67, #405365);
   color: #f7f5f1;
 }
 
 .wizard-step-item.is-complete {
-  border-color: rgba(24, 116, 110, 0.2);
-  background: linear-gradient(180deg, rgba(24, 116, 110, 0.1), rgba(24, 116, 110, 0.03));
+  border-color: rgba(47, 79, 103, 0.12);
+  background: linear-gradient(180deg, rgba(24, 116, 110, 0.05), rgba(24, 116, 110, 0.02));
 }
 
 .wizard-step-item.is-upcoming {
-  opacity: 0.72;
+  opacity: 0.82;
 }
 
 .wizard-overlay {
