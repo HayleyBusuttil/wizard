@@ -3,6 +3,7 @@ import { defineStore } from "pinia";
 const storageKey = "guided-system-cart";
 const compareStorageKey = "guided-system-compare";
 const eventStorageKey = "guided-system-events";
+let toastTimeoutId = null;
 
 const assetModules = import.meta.glob("../assets/**/*.jpg", {
   eager: true,
@@ -357,15 +358,40 @@ export const useProductStore = defineStore("products", {
       this.filters.sort = "featured";
       this.showToast("Filters reset");
     },
-    showToast(message, type = "info") {
+    setToast({ title = "Guided step", message, type = "info" }) {
+      if (toastTimeoutId && typeof window !== "undefined") {
+        window.clearTimeout(toastTimeoutId);
+      }
+
       this.toast = {
-        title: "Guided step",
+        title,
         message,
         type,
         id: Date.now(),
       };
+      const toastId = this.toast.id;
+
+      if (typeof window === "undefined") {
+        return;
+      }
+
+      toastTimeoutId = window.setTimeout(() => {
+        if (this.toast?.id === toastId) {
+          this.toast = null;
+        }
+
+        toastTimeoutId = null;
+      }, 7000);
+    },
+    showToast(message, type = "info") {
+      this.setToast({ message, type });
     },
     dismissToast() {
+      if (toastTimeoutId && typeof window !== "undefined") {
+        window.clearTimeout(toastTimeoutId);
+        toastTimeoutId = null;
+      }
+
       this.toast = null;
     },
     trackEvent(name, payload = {}) {
@@ -803,10 +829,10 @@ export const useProductStore = defineStore("products", {
 
       this.resetWizard();
 
-      this.toast = {
+      this.setToast({
         title: "Guided mode completed",
         message: "You can now explore the app freely.",
-      };
+      });
     },
   },
 });

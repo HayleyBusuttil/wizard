@@ -40,10 +40,11 @@
         </button>
       </div>
 
-      <ol class="wizard-step-list" aria-label="Wizard steps">
+      <ol ref="stepListRef" class="wizard-step-list" aria-label="Wizard steps">
         <li
           v-for="step in store.wizardSteps"
           :key="step.step"
+          :ref="(element) => setStepRef(element, step.step)"
           class="wizard-step-item"
           :class="wizardStepState(step.step)"
         >
@@ -74,6 +75,8 @@ const store = useProductStore()
 const route = useRoute()
 const router = useRouter()
 const spotlight = ref(null)
+const stepListRef = ref(null)
+const stepItemRefs = new Map()
 
 const stepMap = {
   1: {
@@ -202,10 +205,10 @@ function startWizard() {
   }
 
   store.startWizard()
-  store.toast = {
+  store.setToast({
     title: "Welcome to Guided Mode",
     message: "Start by selecting a category to explore products.",
-  }
+  })
 }
 
 function goBack() {
@@ -249,6 +252,42 @@ function updateSpotlight() {
   }
 }
 
+function setStepRef(element, step) {
+  if (element) {
+    stepItemRefs.set(step, element)
+    return
+  }
+
+  stepItemRefs.delete(step)
+}
+
+function scrollActiveStepIntoView() {
+  if (!store.wizard.active) {
+    return
+  }
+
+  const stepList = stepListRef.value
+  const activeStep = stepItemRefs.get(store.wizard.step)
+
+  if (!stepList || !activeStep) {
+    return
+  }
+
+  const containerRect = stepList.getBoundingClientRect()
+  const stepRect = activeStep.getBoundingClientRect()
+  const currentScrollTop = stepList.scrollTop
+  const targetScrollTop =
+    currentScrollTop +
+    (stepRect.top - containerRect.top) -
+    containerRect.height * 0.28 +
+    stepRect.height * 0.5
+
+  stepList.scrollTo({
+    top: Math.max(targetScrollTop, 0),
+    behavior: "smooth",
+  })
+}
+
 let resizeHandler = null
 let scrollHandler = null
 
@@ -257,6 +296,7 @@ watch(
   async () => {
     await nextTick()
     updateSpotlight()
+    scrollActiveStepIntoView()
     window.setTimeout(updateSpotlight, 80)
   },
   { immediate: true },
@@ -287,15 +327,16 @@ onBeforeUnmount(() => {
   top: 18px;
   z-index: 20;
   isolation: isolate;
-  width: min(calc(100% - 32px), 1200px);
-  margin: 16px auto 0;
+  width: 100%;
 }
 
 .wizard-panel-card {
   position: relative;
   z-index: 2;
   display: grid;
+  grid-template-rows: auto auto auto minmax(0, 1fr);
   gap: 16px;
+  max-height: min(calc(100dvh - 114px), 760px);
   padding: 20px 22px;
   border: 1px solid rgba(35, 45, 68, 0.18);
   border-radius: 28px;
@@ -395,10 +436,9 @@ onBeforeUnmount(() => {
 }
 
 .wizard-panel-actions {
-  display: flex;
+  display: grid;
   gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
+  align-items: start;
 }
 
 .wizard-lock-note {
@@ -412,8 +452,19 @@ onBeforeUnmount(() => {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: 1fr;
   gap: 12px;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+  scroll-padding-block: 22%;
+}
+
+.wizard-step-list::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .wizard-step-item {
@@ -426,6 +477,17 @@ onBeforeUnmount(() => {
   background: rgba(255, 255, 255, 0.94);
   border: 1px solid rgba(35, 45, 68, 0.1);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  position: relative;
+}
+
+.wizard-step-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 31px;
+  top: calc(100% + 2px);
+  width: 2px;
+  height: 12px;
+  background: linear-gradient(180deg, rgba(24, 116, 110, 0.35), rgba(35, 45, 68, 0.06));
 }
 
 .wizard-step-number {
@@ -485,11 +547,11 @@ onBeforeUnmount(() => {
 
 @media (max-width: 720px) {
   .wizard-panel-shell {
-    width: min(calc(100% - 20px), 1200px);
     top: 10px;
   }
 
   .wizard-panel-card {
+    max-height: min(calc(100dvh - 20px), 720px);
     padding: 18px;
     border-radius: 20px;
   }
@@ -498,10 +560,6 @@ onBeforeUnmount(() => {
   .wizard-progress-meta {
     flex-direction: column;
     align-items: flex-start;
-  }
-
-  .wizard-step-list {
-    grid-template-columns: 1fr;
   }
 }
 </style>

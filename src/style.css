@@ -83,7 +83,8 @@ img {
 .app-shell {
   position: relative;
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .app-bg {
@@ -130,6 +131,10 @@ img {
 }
 
 .nav-bar {
+  position: fixed;
+  top: 14px;
+  left: 50%;
+  transform: translateX(-50%);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -139,7 +144,8 @@ img {
   border: 1px solid rgba(227, 223, 216, 0.8);
   border-radius: 18px;
   backdrop-filter: blur(10px);
-  margin-top: 14px;
+  width: min(calc(100% - 20px), 1480px);
+  z-index: 40;
 }
 
 .brand {
@@ -1266,6 +1272,7 @@ img {
     flex-wrap: wrap;
     justify-content: center;
     row-gap: 12px;
+    top: 10px;
     padding: 14px 16px;
   }
 
@@ -1575,6 +1582,7 @@ img {
 .compact-cart-layout {
   align-items: start;
   gap: 1.4rem;
+  grid-template-columns: minmax(0, 1.35fr) minmax(340px, 0.65fr);
 }
 
 .compact-cart-list {

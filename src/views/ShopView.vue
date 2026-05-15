@@ -499,10 +499,10 @@ onMounted(() => {
   }
 
   store.startWizard()
-  store.toast = {
+  store.setToast({
     title: "Welcome to Guided Mode",
     message: "Start by selecting a category to explore products.",
-  }
+  })
 })
 
 watch(
