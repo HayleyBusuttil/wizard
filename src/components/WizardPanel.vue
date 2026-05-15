@@ -79,43 +79,43 @@ const stepMap = {
   1: {
     selector: '[data-wizard-target="category-select"]',
     title: "Choose category",
-    copy: "Choose a category to unlock the next focused set of products.",
+    copy: "Choose a category.",
     route: "/shop",
   },
   2: {
     selector: '[data-wizard-target="product-grid"]',
     title: "Select product",
-    copy: "Select one product from the narrowed product grid.",
+    copy: "Pick one product.",
     route: "/shop",
   },
   3: {
     selector: '[data-wizard-target="compare-products"]',
     title: "Compare products",
-    copy: "Add one more product to the comparison tray before opening the guided product.",
+    copy: "Compare two products.",
     route: "/shop",
   },
   4: {
     selector: '[data-wizard-target="wizard-selected-product"]',
     title: "Open product",
-    copy: "Open the selected product card to continue.",
+    copy: "Open the chosen product.",
     route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
   5: {
     selector: '[data-wizard-target="product-options"]',
     title: "Choose options",
-    copy: "Choose valid product options before the add-to-cart step unlocks.",
+    copy: "Choose the options.",
     route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
   6: {
     selector: '[data-wizard-target="add-to-cart"]',
     title: "Add to cart",
-    copy: "Add the configured item from the product page to continue.",
+    copy: "Add it to cart.",
     route: () => `/product/${store.wizard.selectedProductId || ""}`,
   },
   7: {
     selector: '[data-wizard-target="checkout-panel"]',
     title: "Checkout",
-    copy: "Review the cart and complete the simulated checkout form.",
+    copy: "Finish checkout.",
     route: "/cart",
   },
 }
@@ -143,11 +143,11 @@ const stepCounter = computed(() => {
 const panelCopy = computed(() => {
   if (!store.wizard.active) {
     return route.path === "/shop"
-      ? "Guided mode begins here and leads shoppers from category selection through checkout."
-      : "Users begin on the home page and the guided flow starts once they open the shop."
+      ? "Simple step-by-step shopping."
+      : "The guide starts in the shop."
   }
 
-  return stepMap[store.wizard.step]?.copy ?? "Follow the guided flow to complete the shopping task."
+  return stepMap[store.wizard.step]?.copy ?? "Follow the steps."
 })
 
 const spotlightStyle = computed(() => {
@@ -297,12 +297,23 @@ onBeforeUnmount(() => {
   display: grid;
   gap: 16px;
   padding: 20px 22px;
-  border: 1px solid rgba(35, 45, 68, 0.28);
-  border-radius: 24px;
+  border: 1px solid rgba(35, 45, 68, 0.18);
+  border-radius: 28px;
   background:
-    linear-gradient(135deg, #ffffff, #f6f2eb),
+    radial-gradient(circle at top right, rgba(24, 116, 110, 0.12), transparent 28%),
+    linear-gradient(135deg, #ffffff, #f0ece5),
     #ffffff;
-  box-shadow: 0 18px 38px rgba(35, 45, 68, 0.12);
+  box-shadow: 0 24px 50px rgba(35, 45, 68, 0.16);
+  overflow: hidden;
+}
+
+.wizard-panel-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  pointer-events: none;
 }
 
 .wizard-panel-header {
@@ -327,15 +338,16 @@ onBeforeUnmount(() => {
   justify-content: center;
   padding: 8px 12px;
   border-radius: 999px;
-  background: rgba(35, 45, 68, 0.08);
-  color: #232d44;
+  background: linear-gradient(135deg, #18746e, #232d44);
+  color: #f7f5f1;
   font-size: 0.88rem;
   font-weight: 700;
   white-space: nowrap;
+  box-shadow: 0 10px 24px rgba(24, 116, 110, 0.22);
 }
 
 .wizard-panel-copy {
-  color: #5f677a;
+  color: #33405a;
   max-width: 58ch;
   margin-top: 6px;
 }
@@ -344,9 +356,11 @@ onBeforeUnmount(() => {
   display: grid;
   gap: 10px;
   padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(35, 45, 68, 0.05);
-  border: 1px solid rgba(35, 45, 68, 0.08);
+  border-radius: 22px;
+  background:
+    linear-gradient(135deg, rgba(24, 116, 110, 0.08), rgba(255, 255, 255, 0.96)),
+    rgba(35, 45, 68, 0.08);
+  border: 1px solid rgba(24, 116, 110, 0.14);
 }
 
 .wizard-progress-meta {
@@ -361,7 +375,7 @@ onBeforeUnmount(() => {
 }
 
 .wizard-progress-meta span {
-  color: #5f677a;
+  color: #33405a;
   font-weight: 600;
 }
 
@@ -370,13 +384,13 @@ onBeforeUnmount(() => {
   height: 12px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgba(35, 45, 68, 0.1);
+  background: rgba(35, 45, 68, 0.12);
 }
 
 .wizard-progress-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #232d44 0%, #6f8b7d 100%);
+  background: linear-gradient(90deg, #18746e 0%, #232d44 100%);
   transition: width 220ms ease;
 }
 
@@ -389,7 +403,7 @@ onBeforeUnmount(() => {
 
 .wizard-lock-note {
   margin: 0;
-  color: #5f677a;
+  color: #33405a;
   font-weight: 600;
 }
 
@@ -407,10 +421,11 @@ onBeforeUnmount(() => {
   grid-template-columns: 36px minmax(0, 1fr);
   gap: 12px;
   align-items: start;
-  padding: 12px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.66);
-  border: 1px solid rgba(35, 45, 68, 0.08);
+  padding: 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(35, 45, 68, 0.1);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .wizard-step-number {
@@ -419,8 +434,8 @@ onBeforeUnmount(() => {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: rgba(35, 45, 68, 0.08);
-  color: #232d44;
+  background: rgba(24, 116, 110, 0.12);
+  color: #155b57;
   font-weight: 700;
 }
 
@@ -431,25 +446,25 @@ onBeforeUnmount(() => {
 }
 
 .wizard-step-item p {
-  color: #6c7486;
+  color: #33405a;
   font-size: 0.92rem;
   line-height: 1.45;
 }
 
 .wizard-step-item.is-current {
-  border-color: rgba(35, 45, 68, 0.18);
-  background: linear-gradient(180deg, rgba(35, 45, 68, 0.1), rgba(35, 45, 68, 0.03));
-  box-shadow: 0 14px 28px rgba(35, 45, 68, 0.08);
+  border-color: rgba(24, 116, 110, 0.34);
+  background: linear-gradient(180deg, rgba(24, 116, 110, 0.16), rgba(24, 116, 110, 0.05));
+  box-shadow: 0 16px 30px rgba(24, 116, 110, 0.14);
 }
 
 .wizard-step-item.is-current .wizard-step-number {
-  background: #232d44;
+  background: linear-gradient(135deg, #18746e, #232d44);
   color: #f7f5f1;
 }
 
 .wizard-step-item.is-complete {
-  border-color: rgba(120, 144, 110, 0.22);
-  background: linear-gradient(180deg, rgba(120, 144, 110, 0.12), rgba(120, 144, 110, 0.04));
+  border-color: rgba(24, 116, 110, 0.2);
+  background: linear-gradient(180deg, rgba(24, 116, 110, 0.1), rgba(24, 116, 110, 0.03));
 }
 
 .wizard-step-item.is-upcoming {

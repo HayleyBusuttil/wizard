@@ -260,13 +260,13 @@ const currentPageSize = computed(() => (store.wizard.active ? guidedProductsPerP
 
 const wizardInstruction = computed(() => {
   const instructions = {
-    1: "Choose a category to begin browsing.",
-    2: "Select one product to continue.",
-    3: "Compare two products, then choose one from the tray to open.",
-    4: "Open the selected product card.",
-    5: "Choose the required product options.",
-    6: "Add the configured product to cart.",
-    7: "Complete the checkout form.",
+    1: "Choose a category.",
+    2: "Pick one product.",
+    3: "Compare two products.",
+    4: "Open the chosen product.",
+    5: "Choose options.",
+    6: "Add it to cart.",
+    7: "Finish checkout.",
   }
 
   return instructions[store.wizard.step] ?? "Follow the guided shopping flow."
@@ -274,25 +274,25 @@ const wizardInstruction = computed(() => {
 
 const wizardSupport = computed(() => {
   const support = {
-    1: "The system is waiting for a category choice before anything else becomes available.",
-    2: "Only a small set of products is shown to keep the decision focused.",
-    3: "Once two products are in the tray, choose one there to continue into the detail page.",
-    4: "Only the selected product can be opened during this step.",
-    5: "Choose color, size, and quantity before you can continue.",
-    6: "Secondary actions are hidden so the add-to-cart task stays central.",
-    7: "Checkout is now the only remaining task in the guided journey.",
+    1: "Start here.",
+    2: "Only a few products are shown.",
+    3: "Then open one from the compare tray.",
+    4: "Only the chosen product can be opened.",
+    5: "Choose color, size, and quantity.",
+    6: "Use the add to cart button.",
+    7: "Submit the form to finish.",
   }
 
   return support[store.wizard.step] ?? "Use the visible guidance to continue."
 })
 
 const heroTitle = computed(() =>
-  store.wizard.active ? "Complete the guided shopping task." : "Discover your next outfit.",
+  store.wizard.active ? "Follow the guided steps." : "Discover your next outfit.",
 )
 
 const heroLead = computed(() =>
   store.wizard.active
-    ? "This view is intentionally narrowed so participants move through a structured, system-controlled purchase flow."
+    ? "The shop is simplified so the next action is clear."
     : "Browse, filter, compare, and explore products designed for everyday wear.",
 )
 
@@ -318,10 +318,10 @@ const sectionSupport = computed(() => {
 
 const comparisonInstruction = computed(() => {
   if (store.comparisonProducts.length < 2) {
-    return "Add one more product to compare against the selected guided item."
+    return "Add one more product."
   }
 
-  return "Review the comparison below, then choose which product to open for more details."
+  return "Compare them, then open one."
 })
 
 const comparisonCallout = computed(() => {
@@ -332,13 +332,13 @@ const comparisonCallout = computed(() => {
   if (store.comparison.length === 1) {
     return {
       title: "1 item ready to compare",
-      body: "Choose one more product, then scroll down to the comparison tray to review them side by side.",
+      body: "Choose one more product.",
     }
   }
 
   return {
-    title: "Comparison ready below",
-    body: "Two products are selected. The comparison tray has appeared lower on the page with a side-by-side breakdown.",
+    title: "Comparison ready",
+    body: "Open the compare tray below.",
   }
 })
 

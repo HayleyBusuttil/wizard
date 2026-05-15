@@ -240,26 +240,26 @@ const isDetailStep = computed(() => shouldHighlightOptions.value || shouldHighli
 
 const wizardObjective = computed(() => {
   if (store.wizard.step === 5) {
-    return "Choose the product options required to continue."
+    return "Choose product options."
   }
 
   if (store.wizard.step === 6) {
-    return "Add this configured product to the cart."
+    return "Add this product to cart."
   }
 
-  return "Stay on the selected product until the current task is complete."
+  return "Stay on this product."
 })
 
 const wizardSupport = computed(() => {
   if (store.wizard.step === 5) {
-    return "Color, size, and quantity must be valid before the next action unlocks."
+    return "Choose color, size, and quantity."
   }
 
   if (store.wizard.step === 6) {
-    return "Secondary actions are hidden so the guided purchase remains linear."
+    return "Use the main button below."
   }
 
-  return "This page is locked to the selected product in guided mode."
+  return "This page stays locked in guided mode."
 })
 
 watch(

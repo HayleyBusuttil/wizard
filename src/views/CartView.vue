@@ -18,8 +18,8 @@
     <section v-if="store.wizard.active" class="wizard-inline-banner wizard-task-banner">
       <div>
         <p class="eyebrow">Current objective</p>
-        <h3>Complete the guided checkout.</h3>
-        <p>Review the selected item, confirm delivery details, and place the simulated order.</p>
+        <h3>Finish checkout.</h3>
+        <p>Complete the form to finish.</p>
       </div>
       <span class="wizard-stage-pill">Step {{ store.wizard.step }} / {{ store.wizardSteps.length }}</span>
     </section>
