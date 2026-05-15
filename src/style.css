@@ -1910,6 +1910,45 @@ img {
   font-weight: 600;
 }
 
+.progress-callout,
+.arrival-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 0 18px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(35, 45, 68, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(244, 240, 233, 0.88));
+  box-shadow: 0 14px 30px rgba(35, 45, 68, 0.08);
+}
+
+.progress-callout.is-emphasized {
+  border-color: rgba(35, 45, 68, 0.2);
+}
+
+.progress-callout strong,
+.progress-callout p,
+.arrival-banner h3,
+.arrival-banner p {
+  margin: 0;
+}
+
+.progress-callout p,
+.arrival-banner p {
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.progress-callout-action {
+  white-space: nowrap;
+}
+
+.arrival-banner h3 {
+  font-size: 1.45rem;
+}
+
 .wizard-detail-lock {
   box-shadow: 0 26px 50px rgba(35, 45, 68, 0.12);
 }
@@ -2029,7 +2068,15 @@ img {
 
   .wizard-task-banner,
   .wizard-product-banner,
-  .guided-filters {
+  .guided-filters,
+  .progress-callout,
+  .arrival-banner {
     flex-direction: column;
+  }
+
+  .progress-callout-action,
+  .arrival-banner .button-soft {
+    width: 100%;
+    text-align: center;
   }
 }

@@ -95,6 +95,23 @@
       </div>
 
       <p v-if="store.wizard.active" class="wizard-inline-note">{{ wizardInstruction }}</p>
+      <div
+        v-if="comparisonCallout"
+        class="progress-callout"
+        :class="{ 'is-emphasized': store.comparison.length > 0 }"
+        aria-live="polite"
+      >
+        <strong>{{ comparisonCallout.title }}</strong>
+        <p>{{ comparisonCallout.body }}</p>
+        <button
+          v-if="store.comparison.length > 0"
+          type="button"
+          class="text-button progress-callout-action"
+          @click="scrollToCompareTray"
+        >
+          Jump to comparison
+        </button>
+      </div>
 
       <div v-if="store.filteredProducts.length" class="product-grid" data-wizard-target="product-grid">
         <ProductCard
@@ -155,6 +172,7 @@
 
     <section
       v-if="store.comparisonProducts.length && (!store.wizard.active || isStep(3))"
+      ref="compareTrayRef"
       class="compare-tray"
       :class="{ 'wizard-focus': isStep(3) }"
       data-wizard-target="compare-products"
@@ -220,7 +238,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue"
+import { computed, nextTick, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useProductStore } from "../stores/productStore"
 import ProductCard from "../components/ProductCard.vue"
@@ -235,6 +253,7 @@ const search = ref(store.filters.search)
 const category = ref(store.filters.category)
 const collection = ref(store.filters.collection)
 const sort = ref(store.filters.sort)
+const compareTrayRef = ref(null)
 const availableCollections = computed(() => store.collections(category.value))
 
 const currentPageSize = computed(() => (store.wizard.active ? guidedProductsPerPage : standardProductsPerPage))
@@ -303,6 +322,24 @@ const comparisonInstruction = computed(() => {
   }
 
   return "Review the comparison below, then choose which product to open for more details."
+})
+
+const comparisonCallout = computed(() => {
+  if (!store.comparison.length) {
+    return null
+  }
+
+  if (store.comparison.length === 1) {
+    return {
+      title: "1 item ready to compare",
+      body: "Choose one more product, then scroll down to the comparison tray to review them side by side.",
+    }
+  }
+
+  return {
+    title: "Comparison ready below",
+    body: "Two products are selected. The comparison tray has appeared lower on the page with a side-by-side breakdown.",
+  }
 })
 
 let timeout = null
@@ -445,11 +482,42 @@ const openComparedProduct = (productId) => {
   }
 }
 
+const scrollToCompareTray = () => {
+  if (!compareTrayRef.value) {
+    return
+  }
+
+  compareTrayRef.value.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  })
+}
+
 watch(
   () => [store.filteredProducts.length, currentPageSize.value],
   () => {
     if (currentPage.value > totalPages.value) {
       currentPage.value = totalPages.value
+    }
+  },
+)
+
+watch(
+  () => store.comparison.length,
+  async (newLength, oldLength) => {
+    if (!newLength || newLength === oldLength) {
+      return
+    }
+
+    await nextTick()
+
+    if (newLength >= 2) {
+      scrollToCompareTray()
+      return
+    }
+
+    if (oldLength === 0 && newLength === 1) {
+      store.showToast("First item added to compare. Choose one more, then use the comparison section below.", "info")
     }
   },
 )

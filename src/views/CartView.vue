@@ -24,6 +24,17 @@
       <span class="wizard-stage-pill">Step {{ store.wizard.step }} / {{ store.wizardSteps.length }}</span>
     </section>
 
+    <section v-if="cartArrivalMessage" class="arrival-banner" aria-live="polite">
+      <div>
+        <p class="eyebrow">Next step</p>
+        <h3>{{ cartArrivalMessage.title }}</h3>
+        <p>{{ cartArrivalMessage.body }}</p>
+      </div>
+      <button type="button" class="button-soft button-sm" @click="scrollToCheckout">
+        Go to checkout
+      </button>
+    </section>
+
     <div v-if="store.cartItems.length" class="cart-layout compact-cart-layout">
       <section class="cart-list compact-cart-list" aria-label="Cart items">
         <article
@@ -81,6 +92,7 @@
       </section>
 
       <aside
+        ref="checkoutPanelRef"
         class="checkout-panel compact-checkout-panel"
         :class="{ 'wizard-focus': store.wizard.active && store.wizard.step === 7 }"
         data-wizard-target="checkout-panel"
@@ -257,6 +269,7 @@ import { useProductStore } from "../stores/productStore"
 
 const store = useProductStore()
 const order = ref(store.lastOrder)
+const checkoutPanelRef = ref(null)
 
 const euroFormatter = new Intl.NumberFormat("en-IE", {
   style: "currency",
@@ -298,6 +311,36 @@ const heroLead = computed(() =>
 const deliveryComplete = computed(() => Boolean(form.name && form.email && form.address))
 const paymentComplete = computed(() => Boolean(form.cardNumber && form.expiry && form.cvv))
 const checkoutReady = computed(() => deliveryComplete.value && paymentComplete.value)
+const cartArrivalMessage = computed(() => {
+  const event = store.lastCartEvent
+
+  if (!event || !store.cartItems.length) {
+    return null
+  }
+
+  const secondsSinceAdd = Date.now() - event.timestamp
+  if (secondsSinceAdd > 15000) {
+    return null
+  }
+
+  return {
+    title: `${event.productName} was added to your cart`,
+    body: store.wizard.active
+      ? "You have been moved to the checkout step. The order summary and form are just below."
+      : "Your cart has updated. Review the summary and checkout form on this page when you're ready.",
+  }
+})
+
+function scrollToCheckout() {
+  if (!checkoutPanelRef.value) {
+    return
+  }
+
+  checkoutPanelRef.value.scrollIntoView({
+    behavior: "smooth",
+    block: "start",
+  })
+}
 
 function completeCheckout() {
   if (!checkoutReady.value) {

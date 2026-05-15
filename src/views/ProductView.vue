@@ -183,11 +183,12 @@
 
 <script setup>
 import { computed, onBeforeUnmount, ref, watch } from "vue"
-import { useRoute } from "vue-router"
+import { useRoute, useRouter } from "vue-router"
 import { useProductStore } from "../stores/productStore"
 import ProductCard from "../components/ProductCard.vue"
 
 const route = useRoute()
+const router = useRouter()
 const store = useProductStore()
 
 const product = computed(() => store.productById(route.params.id))
@@ -315,6 +316,10 @@ function addToCart() {
   }
 
   store.addToCart(product.value.id, quantity.value, selectedColor.value, selectedSize.value)
+
+  if (store.wizard.active && store.wizard.step === 7) {
+    router.push("/cart")
+  }
 }
 
 function completeOptionStep() {

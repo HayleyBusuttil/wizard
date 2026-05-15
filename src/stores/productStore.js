@@ -164,6 +164,7 @@ export const useProductStore = defineStore("products", {
     comparison: loadJSON(compareStorageKey, []),
     events: loadJSON(eventStorageKey, []),
     lastOrder: null,
+    lastCartEvent: null,
     toast: null,
     wizard: {
       active: false,
@@ -428,9 +429,18 @@ export const useProductStore = defineStore("products", {
         size: chosenSize,
       });
       this.showToast(`${product.name} added to cart`);
+      this.lastCartEvent = {
+        productId,
+        productName: product.name,
+        quantity,
+        color: chosenColor,
+        size: chosenSize,
+        timestamp: Date.now(),
+      };
 
       if (this.wizard.active && this.wizard.step === 6) {
         this.setWizardStep(7);
+        this.showToast(`${product.name} added to cart. Checkout is now ready.`, "info");
       }
     },
     updateCartQuantity(productId, color, quantity, size = null) {
