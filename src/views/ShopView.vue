@@ -2,7 +2,7 @@
   <section class="page page-shop refined-layout" :class="{ 'wizard-shop-mode': store.wizard.active }">
     <header class="shop-hero" :class="{ 'is-muted': store.wizard.active }">
       <div>
-        <p class="eyebrow">TEST</p>
+        <p class="eyebrow">Shop</p>
         <h1>{{ heroTitle }}</h1>
         <p class="lead">
           {{ heroLead }}
@@ -238,7 +238,7 @@
 </template>
 
 <script setup>
-import { computed, nextTick, ref, watch } from "vue"
+import { computed, nextTick, onMounted, ref, watch } from "vue"
 import { useRouter } from "vue-router"
 import { useProductStore } from "../stores/productStore"
 import ProductCard from "../components/ProductCard.vue"
@@ -492,6 +492,18 @@ const scrollToCompareTray = () => {
     block: "start",
   })
 }
+
+onMounted(() => {
+  if (store.wizard.active) {
+    return
+  }
+
+  store.startWizard()
+  store.toast = {
+    title: "Welcome to Guided Mode",
+    message: "Start by selecting a category to explore products.",
+  }
+})
 
 watch(
   () => [store.filteredProducts.length, currentPageSize.value],

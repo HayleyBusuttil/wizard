@@ -142,7 +142,9 @@ const stepCounter = computed(() => {
 
 const panelCopy = computed(() => {
   if (!store.wizard.active) {
-    return "Start guided mode to follow the shop-to-checkout path with visible in-context guidance."
+    return route.path === "/shop"
+      ? "Guided mode begins here and leads shoppers from category selection through checkout."
+      : "Users begin on the home page and the guided flow starts once they open the shop."
   }
 
   return stepMap[store.wizard.step]?.copy ?? "Follow the guided flow to complete the shopping task."
@@ -194,8 +196,16 @@ function wizardStepState(step) {
 }
 
 function startWizard() {
+  if (route.path !== "/shop") {
+    router.replace("/shop")
+    return
+  }
+
   store.startWizard()
-  router.replace("/shop")
+  store.toast = {
+    title: "Welcome to Guided Mode",
+    message: "Start by selecting a category to explore products.",
+  }
 }
 
 function goBack() {

@@ -8,7 +8,7 @@
     <Navbar />
 
     <!-- Wizard Panel (main guidance) -->
-    <WizardPanel />
+    <WizardPanel v-if="showWizardPanel" />
 
     <!-- Main Content -->
     <main class="app-main">
@@ -34,25 +34,15 @@
 </template>
 
 <script setup>
-import { onMounted } from "vue"
-import { useRouter } from "vue-router"
+import { computed } from "vue"
+import { useRoute } from "vue-router"
 import Navbar from "./components/Navbar.vue"
 import WizardPanel from "./components/WizardPanel.vue"
 import { useProductStore } from "./stores/productStore"
 
 const store = useProductStore()
-const router = useRouter()
-
-onMounted(() => {
-  if (!store.wizard.active) {
-    store.startWizard()
-    router.replace("/shop")
-    store.toast = {
-      title: "Welcome to Guided Mode",
-      message: "Start by selecting a category to explore products.",
-    }
-  }
-})
+const route = useRoute()
+const showWizardPanel = computed(() => route.path !== "/")
 </script>
 
 <style scoped>
