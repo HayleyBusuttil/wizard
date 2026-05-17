@@ -154,11 +154,6 @@
           </button>
         </nav>
       </div>
-
-      <div v-else class="empty-state">
-        <h3>No products found</h3>
-        <p>Try adjusting your filters.</p>
-      </div>
     </section>
 
     <section
