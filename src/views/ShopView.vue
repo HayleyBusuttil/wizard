@@ -155,10 +155,6 @@
         </nav>
       </div>
 
-      <div v-else-if="store.wizard.active && store.filteredProducts.length > visibleProducts.length" class="guided-results-note">
-        Guided mode is showing a smaller focused set so users can make one decision at a time.
-      </div>
-
       <div v-else class="empty-state">
         <h3>No products found</h3>
         <p>Try adjusting your filters.</p>
