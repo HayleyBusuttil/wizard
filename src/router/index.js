@@ -1,3 +1,5 @@
+//Defines the website routes and controls which pages the user can access during the guided mode
+//If the user tries to access a page that is not allowed in the current step of the wizard, they will be redirected to the appropriate page for that step.
 import { createRouter, createWebHashHistory } from "vue-router"
 import { useProductStore } from "../stores/productStore"
 

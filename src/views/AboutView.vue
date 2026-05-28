@@ -1,7 +1,8 @@
+<!--About view for displaying information about the brand -->
 <template>
   <section class="page page-about refined-layout">
 
-    <!-- HERO -->
+    <!-- Hero -->
     <header class="about-hero split">
       <div class="about-copy">
         <p class="eyebrow">About {{ brandName }}</p>
@@ -14,7 +15,7 @@
 
     </header>
 
-    <!-- STORY -->
+    <!-- Story -->
     <section class="about-story grid-2">
       <article>
         <p class="eyebrow">Our approach</p>
@@ -35,7 +36,7 @@
       </article>
     </section>
 
-    <!-- FEATURES -->
+    <!-- Features -->
     <section class="about-features grid-3">
       <div class="feature">
         <h3>Focused categories</h3>
@@ -53,7 +54,7 @@
       </div>
     </section>
 
-    <!-- CATEGORY LIST -->
+    <!-- Category list-->
     <section class="category-focus">
       <div class="section-heading">
         <h2>Explore categories</h2>

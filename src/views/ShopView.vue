@@ -1,3 +1,4 @@
+<!--Shop view for browsing and filtering products -->
 <template>
   <section class="page page-shop refined-layout" :class="{ 'wizard-shop-mode': store.wizard.active }">
     <header class="shop-hero" :class="{ 'is-muted': store.wizard.active }">

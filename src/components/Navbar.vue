@@ -1,3 +1,4 @@
+<!--Navigation bar for the application-->
 <template>
   <nav class="nav-bar">
     <RouterLink class="brand" to="/">AURA</RouterLink>

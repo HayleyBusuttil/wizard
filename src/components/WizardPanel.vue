@@ -1,3 +1,4 @@
+<!--Displays the guided step by sstep panel, progressing bar, current objective and highlights -->
 <template>
   <section class="wizard-panel-shell" :class="{ 'is-active': store.wizard.active }" aria-live="polite">
     <div class="wizard-panel-card">

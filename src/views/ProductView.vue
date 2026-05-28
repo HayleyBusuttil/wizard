@@ -1,3 +1,4 @@
+<!--Product detail view for displaying individual product information -->
 <template>
   <section v-if="product" class="page page-product" :class="{ 'wizard-product-mode': store.wizard.active }">
     <nav v-if="!store.wizard.active" class="breadcrumbs">

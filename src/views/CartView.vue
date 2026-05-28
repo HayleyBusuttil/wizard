@@ -1,3 +1,4 @@
+<!--Cart view for reviewing cart items and completing checkout, with support for a guided wizard mode-->
 <template>
   <section class="page page-cart refined-layout" :class="{ 'wizard-cart-mode': store.wizard.active }">
     <header class="shop-hero cart-hero">

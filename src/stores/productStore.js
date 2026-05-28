@@ -1,3 +1,5 @@
+//this is the main state management file. it stores product data, cart data, comparison data, and the state of the guided wizard. 
+//it also contains actions to manipulate these states and track user interactions.
 import { defineStore } from "pinia";
 
 const storageKey = "guided-system-cart";

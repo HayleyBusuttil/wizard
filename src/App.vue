@@ -1,3 +1,4 @@
+<!--Main layout of the application-->
 <template>
   <div class="app-shell">
     <!-- Background -->

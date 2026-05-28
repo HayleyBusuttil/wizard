@@ -1,3 +1,4 @@
+<!--Home view for the main landing page -->
 <template>
   <section class="page page-home">
     <header class="hero-editorial">

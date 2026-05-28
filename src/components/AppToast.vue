@@ -1,3 +1,4 @@
+<!--displays a message to guide or warn the user during flow-->
 <template>
   <transition name="toast-drop">
     <div v-if="toast" class="app-toast-wrap" aria-live="polite" aria-atomic="true">
